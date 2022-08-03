@@ -30,7 +30,7 @@ function App({
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 20 * 1000,
+            staleTime: 30 * 1000,
           },
         },
       }),
