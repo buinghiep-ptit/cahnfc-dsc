@@ -18,6 +18,8 @@ interface HomeProps {
 }
 
 const Home: NextPage = () => {
+  const x = 1
+
   const router = useRouter()
 
   const { data }: UseQueryResult<IPost[], Error> = useQuery<IPost[], Error>(
