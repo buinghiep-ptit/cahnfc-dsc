@@ -43,7 +43,8 @@
       "error",
       {
         "cases": {
-          "kebabCase": true
+          "kebabCase": true,
+          "camelCase": true
         },
         "ignore": ["^\\[|\\]\\.tsx$", "^\\[|\\]\\.ts$"]
       }

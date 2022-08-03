@@ -12,10 +12,10 @@ import {
 } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import '../styles/globals.css'
+import { Provider, useCreateStore } from '@/store'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
-
 interface AppProps extends AppPropsWithLayout {
   emotionCache?: EmotionCache
 }
@@ -25,6 +25,9 @@ function App({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }: AppProps) {
+  const createStore = useCreateStore(pageProps.initialZustandState)
+  console.log('store:', createStore().getState())
+
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -37,19 +40,21 @@ function App({
   )
   const Layout = Component.Layout ?? EmptyLayout
   return (
-    <QueryClientProvider client={queryClient}>
-      <Hydrate state={pageProps.dehydratedState}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <CacheProvider value={emotionCache}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </ThemeProvider>
-        </CacheProvider>
-      </Hydrate>
-    </QueryClientProvider>
+    <Provider createStore={createStore}>
+      <QueryClientProvider client={queryClient}>
+        <Hydrate state={pageProps.dehydratedState}>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <CacheProvider value={emotionCache}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </ThemeProvider>
+          </CacheProvider>
+        </Hydrate>
+      </QueryClientProvider>
+    </Provider>
   )
 }
 
