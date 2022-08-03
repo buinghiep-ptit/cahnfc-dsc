@@ -18,7 +18,7 @@ interface HomeProps {
 }
 
 const Home: NextPage = () => {
-  const x = 2
+  const x = 200
 
   const router = useRouter()
 

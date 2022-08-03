@@ -13,7 +13,7 @@
     "format:check": "prettier --check \"{,!(.next)/**/}*.{ts, tsx}\"",
     "format:fix": "prettier --write \"{,!(.next)/**/}*.{ts, tsx}\"",
     "prepare": "husky install",
-    "postinstall": "husky install"npx husky add .husky/commit-msg "",
+    "postinstall": "husky install",
     "test-all": "npm run format:check && npm run lint:check && npm run type-check"
   },
   "lint-staged": {
