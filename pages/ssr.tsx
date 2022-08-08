@@ -1,24 +1,20 @@
-import React from 'react'
-import Counter from '@/components/counter'
+import Page from '@/components/page'
+import { initializeStore } from '@/store'
 
-export default function SSG() {
-  return <Counter />
+export default function SSR() {
+  return <Page />
 }
 
-// If you build and start the app, the date returned here will have the same
-// value for all requests, as this method gets executed at build time.
+// The date returned here will be different for every request that hits the page,
+// that is because the page becomes a serverless function instead of being statically
+// exported when you use `getServerSideProps` or `getInitialProps`
 export function getServerSideProps() {
-  // Note that in this case we're returning the state directly, without creating
-  // the store first (like in /pages/ssr.js), this approach can be better and easier
-  console.log('getServerSideProps')
-
+  const zustandStore = initializeStore()
   return {
     props: {
-      initialZustandState: {
-        lastUpdate: Date.now(),
-        light: false,
-        count: 999,
-      },
+      // the "stringify and then parse again" piece is required as next.js
+      // isn't able to serialize it to JSON properly
+      initialZustandState: JSON.parse(JSON.stringify(zustandStore.getState())),
     },
   }
 }

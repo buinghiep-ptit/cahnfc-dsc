@@ -1,4 +1,7 @@
 import { useStore } from '@/store'
+import { Typography } from '@mui/material'
+import { Box } from '@mui/system'
+import { useEffect, useState } from 'react'
 import shallow from 'zustand/shallow'
 const useCounter = () => {
   const { count, increment, decrement, reset } = useStore(
@@ -16,16 +19,18 @@ const useCounter = () => {
 
 const Counter = () => {
   const { count, increment, decrement, reset } = useCounter()
-  console.log('useCounter:', useCounter())
+  const [isSSR, setIsSSR] = useState(true)
+
+  useEffect(() => {
+    setIsSSR(false)
+  }, [])
   return (
-    <div>
-      <h1>
-        Count: <span>{count}</span>
-      </h1>
-      {/* <button onClick={increment}>+1</button>
+    <Box>
+      <Typography variant="h3">Count: {count}</Typography>
+      <button onClick={increment}>+1</button>
       <button onClick={decrement}>-1</button>
-      <button onClick={reset}>Reset</button> */}
-    </div>
+      <button onClick={reset}>Reset</button>
+    </Box>
   )
 }
 

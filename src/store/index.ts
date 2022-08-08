@@ -16,30 +16,49 @@ const zustandContext = createContext()
 // An example of how to get types
 /** @type {import('zustand/index').UseStore<typeof initialState>} */
 
-export const { Provider, useStore } = zustandContext
+export const { Provider: ZustandProvider, useStore } = zustandContext
 
 export const initializeStore = (preloadedState = {}) => {
   return create(
     devtools(
-      persist((set, get: any) => ({
-        ...getDefaultInitialState(),
-        ...preloadedState,
-        increment: () => {
-          set({
-            count: get().count + 1,
-          })
+      persist(
+        (set, get: any) => ({
+          ...getDefaultInitialState(),
+          ...preloadedState,
+          increment: () => {
+            set({
+              count: get().count + 1,
+            })
+          },
+          decrement: () => {
+            set({
+              count: get().count - 1,
+            })
+          },
+          reset: () => {
+            set({
+              count: getDefaultInitialState().count,
+            })
+          },
+        }),
+        {
+          name: 'next-zustand',
+          getStorage: () => ({
+            setItem: (...args) => window.localStorage.setItem(...args),
+            removeItem: (...args) => window.localStorage.removeItem(...args),
+            getItem: async (...args) =>
+              new Promise(resolve => {
+                if (typeof window === 'undefined') {
+                  resolve(null)
+                } else {
+                  setTimeout(() => {
+                    resolve(window.localStorage.getItem(...args))
+                  }, 0)
+                }
+              }),
+          }),
         },
-        decrement: () => {
-          set({
-            count: get().count - 1,
-          })
-        },
-        reset: () => {
-          set({
-            count: getDefaultInitialState().count,
-          })
-        },
-      })),
+      ),
     ),
   )
 }
@@ -78,7 +97,7 @@ export function useCreateStore(serverInitialState: any) {
       true, // replace states, rather than shallow merging
     )
   }
-  // })
+  //   })
 
   return () => store
 }

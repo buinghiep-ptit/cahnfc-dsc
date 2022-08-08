@@ -1,6 +1,7 @@
 import { fetchPosts } from '@/api-client'
 import Page from '@/components/page'
 import { IPost } from '@/models'
+import { initializeStore } from '@/store'
 import {
   dehydrate,
   DehydratedState,
@@ -50,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async (): Promise<{
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      initialZustandState: { count: 1 },
+      // initialZustandState: { count: 2 },
     },
   }
 }

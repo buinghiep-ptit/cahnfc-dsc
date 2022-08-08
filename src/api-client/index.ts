@@ -1,1 +1,2 @@
-export * from './posts-api'
+export * from './auth-api'
+export * from './post-api'
