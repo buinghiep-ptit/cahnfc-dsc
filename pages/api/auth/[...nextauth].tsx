@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { login } from '@/api-client'
+import { login, renewToken } from '@/api-client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import NextAuth, {
   NextAuthOptions,
@@ -46,10 +46,8 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
             username: credentials!.email,
             password: credentials!.password,
           }
-          // Add logic here to look up the user from the credentials supplied
           const tokenUser = await login(payload)
           // const cookies = response.headers["set-cookie"];
-
           // res.setHeader("Set-Cookie", cookies);
           return tokenUser
         },
@@ -85,10 +83,26 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         user,
       }: {
         token: JWT
-        user?: User & Record<'accessToken', string>
+        user?: User & Record<'accessToken' | 'refreshToken' | string, string>
       }) => {
-        token && console.log('token:', token)
         user && (token = { ...token, ...user })
+        if (token?.refreshToken) {
+          const tokenExpiry = token.expires as number
+          const almostNow = Date.now() + 60 * 1000
+          if (tokenExpiry !== undefined && tokenExpiry < almostNow) {
+            try {
+              const newToken = await renewToken({
+                refreshToken: token?.refreshToken as string,
+                deviceId: 'XXX-XX-XXX',
+              })
+              token.accessToken = newToken.accessToken
+              token.expires = newToken.expires
+              //   return { ...token, ...newToken }
+            } catch (error) {
+              console.error(error, 'Error refreshing access token')
+            }
+          }
+        }
 
         return token
       },
@@ -99,10 +113,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         session: Session & { accessToken?: string }
         token: JWT
       }) => {
-        // console.log('token:', token)
-        session = { ...token } as Session
-        console.log('session:', session)
-
+        session = { ...session, ...token } as Session
         return session
       },
     },

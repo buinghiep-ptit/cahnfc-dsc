@@ -1,23 +1,19 @@
-import { ILoginPayload } from '@/models'
+import { ILoginPayload, IUserInfo } from '@/models'
 import { http } from './http-config'
 
-// export const authApi = {
-//   async login(payload: ILoginPayload) {
-//     return axiosClient.post('/login', payload)
-//   },
-//   logout() {
-//     return axiosClient.post('/logout')
-//   },
-//   getProfile() {
-//     return axiosClient.get('/profile')
-//   },
-// }
 export const login = async (params: ILoginPayload): Promise<any> => {
   const { data } = await http.post<any>('/login', params)
   return data
 }
 
-export const getProfile = async (): Promise<any> => {
-  const { data } = await http.get<any>('/profile')
+export const renewToken = async (
+  params: Record<string, string>,
+): Promise<any> => {
+  const { data } = await http.post<any>('/login', params)
+  return data
+}
+
+export const getProfile = async (): Promise<IUserInfo> => {
+  const { data } = await http.get<IUserInfo>('/profile')
   return data
 }

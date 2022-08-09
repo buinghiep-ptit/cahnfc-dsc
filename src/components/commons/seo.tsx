@@ -113,9 +113,14 @@ export default function Seo(props: SeoProps) {
 
   return (
     <Head>
+      {/* Search Engine Optimization Meta Tags */}
       <title>{meta.title}</title>
       <meta name="robots" content={meta.robots} />
-      <meta content={meta.description} name="description" />
+      <meta name="description" content={meta.description} />
+      <meta
+        name="keywords"
+        content="Software Engineer,Product Manager,Project Manager,Data Scientist,Computer Scientist"
+      />
       <meta property="og:url" content={`${meta.url}${router.asPath}`} />
       <link rel="canonical" href={`${meta.url}${router.asPath}`} />
       {/* Open Graph */}
@@ -138,7 +143,7 @@ export default function Seo(props: SeoProps) {
             property="og:publish_date"
             content={meta.date}
           />
-          <meta name="author" property="article:author" content="DSC dev" />
+          <meta name="author" property="article:author" content="dsc dev" />
         </>
       )}
 
