@@ -1,14 +1,20 @@
 import { useLayoutEffect } from 'react'
 import create from 'zustand'
 import createContext from 'zustand/context'
-import { persist, devtools } from 'zustand/middleware'
+import { devtools, persist } from 'zustand/middleware'
+import {
+  createCartSlice,
+  createLanguageSlice,
+  createThemeSlice,
+} from './slices'
+import { Store } from './types'
 
 let store: any
 
 const getDefaultInitialState = () => ({
-  lastUpdate: new Date().getMinutes(),
-  light: false,
-  count: 0,
+  // lastUpdate: new Date().getMinutes(),
+  // light: false,
+  // count: 0,
 })
 
 const zustandContext = createContext()
@@ -18,31 +24,19 @@ const zustandContext = createContext()
 
 export const { Provider: ZustandProvider, useStore } = zustandContext
 
-export const initializeStore = (preloadedState = {}) => {
-  return create(
+export const initializeStore = (preloadedState = {}) =>
+  create<Store>()(
     devtools(
       persist(
-        (set, get: any) => ({
+        (...a) => ({
           ...getDefaultInitialState(),
           ...preloadedState,
-          increment: () => {
-            set({
-              count: get().count + 1,
-            })
-          },
-          decrement: () => {
-            set({
-              count: get().count - 1,
-            })
-          },
-          reset: () => {
-            set({
-              count: getDefaultInitialState().count,
-            })
-          },
+          ...createCartSlice(...a),
+          ...createThemeSlice(...a),
+          ...createLanguageSlice(...a),
         }),
         {
-          name: 'next-zustand',
+          name: 'zustand',
           getStorage: () => ({
             setItem: (...args) => window.localStorage.setItem(...args),
             removeItem: (...args) => window.localStorage.removeItem(...args),
@@ -61,7 +55,6 @@ export const initializeStore = (preloadedState = {}) => {
       ),
     ),
   )
-}
 
 export function useCreateStore(serverInitialState: any) {
   // Server side code: For SSR & SSG, always use a new store.
@@ -82,22 +75,22 @@ export function useCreateStore(serverInitialState: any) {
   // eslint complaining "React Hooks must be called in the exact same order in every component render"
   // is ignorable as this code runs in same order in a given environment (i.e. client or server)
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  //   useLayoutEffect(() => {
-  // serverInitialState is undefined for CSR pages. It is up to you if you want to reset
-  // states on CSR page navigation or not. I have chosen not to, but if you choose to,
-  // then add `serverInitialState = getDefaultInitialState()` here.
-  if (serverInitialState && isReusingStore) {
-    store.setState(
-      {
-        // re-use functions from existing store
-        ...store.getState(),
-        // but reset all other properties.
-        ...serverInitialState,
-      },
-      true, // replace states, rather than shallow merging
-    )
-  }
-  //   })
+  useLayoutEffect(() => {
+    // serverInitialState is undefined for CSR pages. It is up to you if you want to reset
+    // states on CSR page navigation or not. I have chosen not to, but if you choose to,
+    // then add `serverInitialState = getDefaultInitialState()` here.
+    if (serverInitialState && isReusingStore) {
+      store.setState(
+        {
+          // re-use functions from existing store
+          ...store.getState(),
+          // but reset all other properties.
+          ...serverInitialState,
+        },
+        true, // replace states, rather than shallow merging
+      )
+    }
+  })
 
   return () => store
 }

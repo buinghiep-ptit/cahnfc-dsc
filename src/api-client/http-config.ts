@@ -60,13 +60,10 @@ class Http {
         // return config;
         const originalRequest = req
 
-        const session: { user: { accessToken: string } } & any =
-          await getSession()
+        const session = await getSession()
 
         if (session) {
-          ;(
-            req.headers as any
-          ).Authorization = `Bearer ${session?.user?.accessToken}`
+          ;(req.headers as any).Authorization = `Bearer ${session?.accessToken}`
         }
         // const language = await AsyncStorage.getItem('currentLanguage')
         // req.headers.lang = language ?? 'vi'

@@ -6,9 +6,8 @@ import * as React from 'react'
 
 export interface IProfilePageProps {}
 
-export default function ProilePage(props: IProfilePageProps) {
+export default function ProfilePage(props: IProfilePageProps) {
   const { data: session } = useSession()
-  console.log('session:', session)
 
   const getProfileUser = async () => {
     try {

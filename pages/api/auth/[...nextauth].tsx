@@ -1,21 +1,37 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { login } from '@/api-client'
+import { NextApiRequest, NextApiResponse } from 'next'
 import NextAuth, {
   NextAuthOptions,
   Session,
   SessionStrategy,
   User,
 } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
 import { JWT } from 'next-auth/jwt'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { SessionToken } from 'next-auth/core/lib/cookie'
-import { login } from '@/api-client'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import FacebookProvider from 'next-auth/providers/facebook'
+import GoogleProvider from 'next-auth/providers/google'
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
 const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
   return {
     providers: [
+      FacebookProvider({
+        clientId: process.env.FACEBOOK_CLIENT_ID as string,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+      }),
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID as string,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+        authorization: {
+          params: {
+            prompt: 'consent',
+            access_type: 'offline',
+            response_type: 'code',
+          },
+        },
+      }),
       CredentialsProvider({
         type: 'credentials',
         credentials: {
@@ -31,13 +47,11 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
             password: credentials!.password,
           }
           // Add logic here to look up the user from the credentials supplied
-          const response = await login(payload)
+          const tokenUser = await login(payload)
           // const cookies = response.headers["set-cookie"];
 
           // res.setHeader("Set-Cookie", cookies);
-          return {
-            token: response,
-          }
+          return tokenUser
         },
       }),
     ],
@@ -52,8 +66,29 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
       maxAge: 60 * 60,
     },
     callbacks: {
-      jwt: async ({ token, user }: { token: JWT; user?: User }) => {
-        user && (token.user = user.token)
+      signIn: async ({
+        user,
+        account,
+        profile,
+        credentials,
+      }: Record<string, unknown>) => {
+        return true
+      },
+      register: async ({
+        firstName,
+        lastName,
+        email,
+        password,
+      }: Record<string, string>) => {},
+      jwt: async ({
+        token,
+        user,
+      }: {
+        token: JWT
+        user?: User & Record<'accessToken', string>
+      }) => {
+        token && console.log('token:', token)
+        user && (token = { ...token, ...user })
 
         return token
       },
@@ -61,10 +96,13 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         session,
         token,
       }: {
-        session: Session | { user?: any }
+        session: Session & { accessToken?: string }
         token: JWT
       }) => {
-        session.user = token.user
+        // console.log('token:', token)
+        session = { ...token } as Session
+        console.log('session:', session)
+
         return session
       },
     },

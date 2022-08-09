@@ -18,8 +18,6 @@ export default function AboutPage({ posts }: IAboutPageProps) {
     ['posts'],
     fetchPosts,
   )
-  console.log('about data:', data?.length)
-  console.log('about posts:', posts?.length)
   return <div></div>
 }
 

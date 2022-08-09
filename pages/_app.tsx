@@ -27,9 +27,6 @@ function App({
   emotionCache = clientSideEmotionCache,
 }: AppProps) {
   const createStore = useCreateStore(pageProps.initialZustandState)
-  console.log('store:', createStore().getState())
-  console.log('pageProps.session:', pageProps)
-
   const [queryClient] = useState(
     () =>
       new QueryClient({

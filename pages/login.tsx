@@ -10,7 +10,6 @@ export default function LoginPage(props: ILoginPageProps) {
       password: '20121991',
       redirect: false,
     })
-
     console.log('res:', res)
   }
   return (
