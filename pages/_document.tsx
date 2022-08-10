@@ -1,13 +1,40 @@
-import * as React from 'react'
-import Document, { Html, Head, Main, NextScript } from 'next/document'
+import { GA_ANALYTICS_MEASUREMENT_ID } from '@/lib/gtag'
+import { createEmotionCache, theme } from '@/utils'
 import createEmotionServer from '@emotion/server/create-instance'
-import { theme, createEmotionCache } from '@/utils'
+import Document, { Head, Html, Main, NextScript } from 'next/document'
+import Script from 'next/script'
+
+const isProd = process.env.NODE_ENV === 'production'
 
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html lang="en">
+      <Html lang={'en'}>
         <Head>
+          {/* enable analytics script only for production */}
+          {isProd && (
+            <>
+              <Script
+                strategy="afterInteractive"
+                async
+                src={`https://www.googletagmanager.com/gtag/js?id=${GA_ANALYTICS_MEASUREMENT_ID}`}
+              />
+              <Script
+                id="gtag-init"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                  __html: `
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '${GA_ANALYTICS_MEASUREMENT_ID}', {
+                      page_path: window.location.pathname,
+                    });
+                  `,
+                }}
+              />
+            </>
+          )}
           {/* PWA primary color */}
           <meta name="theme-color" content={theme.palette.primary.main} />
           <link rel="icon" type="image/x-icon" href="/favicon.ico" />

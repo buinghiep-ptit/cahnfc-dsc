@@ -1,7 +1,6 @@
 import { fetchPosts } from '@/api-client'
 import Page from '@/components/page'
-import { IPost } from '@/models'
-import { initializeStore } from '@/store'
+import { IPost, NextPageWithLayout } from '@/models'
 import {
   dehydrate,
   DehydratedState,
@@ -10,16 +9,14 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query'
 import type { GetServerSideProps, NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
-import styles from '../styles/Home.module.css'
+import { ReactElement } from 'react'
 
 interface HomeProps {
   posts?: IPost[]
 }
 
-const Home: NextPage = () => {
+const Home: NextPageWithLayout = () => {
   const x = 200
 
   const router = useRouter()
@@ -57,3 +54,6 @@ export const getServerSideProps: GetServerSideProps = async (): Promise<{
 }
 
 export default Home
+// Home.getLayout = function getLayout(page: ReactElement) {
+//   return <div>{page}</div>
+// }

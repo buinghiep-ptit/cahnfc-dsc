@@ -12,6 +12,26 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import FacebookProvider from 'next-auth/providers/facebook'
 import GoogleProvider from 'next-auth/providers/google'
 
+const refreshAccessToken = async (
+  payload: { refreshToken: string; deviceId: string } & Record<string, string>,
+): Promise<JWT> => {
+  try {
+    // Get a new set of tokens with a refreshToken
+    const tokenResponse = await renewToken(payload)
+
+    return {
+      ...payload,
+      accessToken: tokenResponse.accessToken,
+      expiredIn: tokenResponse.expiredIn,
+      refreshToken: tokenResponse.refreshToken,
+    }
+  } catch (error) {
+    return {
+      ...payload,
+      error: 'RefreshAccessTokenError' || error,
+    }
+  }
+}
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
 const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
@@ -46,10 +66,19 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
             username: credentials!.email,
             password: credentials!.password,
           }
-          const tokenUser = await login(payload)
+          try {
+            const user = await login(payload)
+
+            if (user.accessToken) {
+              return user
+            }
+
+            return null
+          } catch (error) {
+            throw new Error(`${error}`)
+          }
           // const cookies = response.headers["set-cookie"];
           // res.setHeader("Set-Cookie", cookies);
-          return tokenUser
         },
       }),
     ],
@@ -85,23 +114,22 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         token: JWT
         user?: User & Record<'accessToken' | 'refreshToken' | string, string>
       }) => {
-        user && (token = { ...token, ...user })
-        if (token?.refreshToken) {
-          const tokenExpiry = token.expires as number
-          const almostNow = Date.now() + 60 * 1000
-          if (tokenExpiry !== undefined && tokenExpiry < almostNow) {
-            try {
-              const newToken = await renewToken({
-                refreshToken: token?.refreshToken as string,
-                deviceId: 'XXX-XX-XXX',
-              })
-              token.accessToken = newToken.accessToken
-              token.expires = newToken.expires
-              //   return { ...token, ...newToken }
-            } catch (error) {
-              console.error(error, 'Error refreshing access token')
-            }
-          }
+        if (user) {
+          token.accessToken = user.accessToken
+          token.expiredAt = user.expiredAt
+          token.refreshToken = user.refreshToken || null
+        }
+
+        const shouldRefreshTime = Math.round(
+          (token.expiredAt as number) - 30 * 60 * 1000 - Date.now(), // 30 minutes
+        )
+        if (shouldRefreshTime > 0) return token
+
+        if (token.refreshToken) {
+          token = (await refreshAccessToken({
+            refreshToken: token.refreshToken as string,
+            deviceId: 'XXX-XX-XXX',
+          })) as JWT & Record<string, string>
         }
 
         return token
@@ -114,6 +142,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         token: JWT
       }) => {
         session = { ...session, ...token } as Session
+
         return session
       },
     },
