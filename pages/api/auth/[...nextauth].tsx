@@ -110,10 +110,15 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
       jwt: async ({
         token,
         user,
+        account,
       }: {
         token: JWT
         user?: User & Record<'accessToken' | 'refreshToken' | string, string>
+        account?: any
       }) => {
+        console.log('token:', token)
+        console.log('user:', user)
+        console.log('account:', account)
         if (user) {
           token.accessToken = user.accessToken
           token.expiredAt = user.expiredAt
@@ -131,7 +136,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
             deviceId: 'XXX-XX-XXX',
           })) as JWT & Record<string, string>
         }
-        console.log('token:', token)
+
         return token
       },
       session: async ({
