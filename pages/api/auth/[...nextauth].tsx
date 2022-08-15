@@ -40,6 +40,21 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
       FacebookProvider({
         clientId: process.env.FACEBOOK_CLIENT_ID as string,
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+        userinfo: {
+          params: {
+            fields:
+              'id,email,first_name,last_name,birthday,picture{is_silhouette,url}',
+          },
+        },
+        profile(profile: any) {
+          return {
+            ...profile,
+            firstName: profile.first_name,
+            lastName: profile.last_name,
+            is_silhouette: profile.picture.data.is_silhouette,
+            image: profile.picture.data.url,
+          }
+        },
       }),
       GoogleProvider({
         clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -116,13 +131,14 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         user?: User & Record<'accessToken' | 'refreshToken' | string, string>
         account?: any
       }) => {
-        console.log('token:', token)
-        console.log('user:', user)
-        console.log('account:', account)
         if (user) {
           token.accessToken = user.accessToken
           token.expiredAt = user.expiredAt
           token.refreshToken = user.refreshToken || null
+        }
+
+        if (account) {
+          token.accessToken = account.access_token
         }
 
         const shouldRefreshTime = Math.round(
@@ -147,7 +163,6 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         token: JWT
       }) => {
         session = { ...session, ...token } as Session
-        console.log('session:', session)
 
         return session
       },
