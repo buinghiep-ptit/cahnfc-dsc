@@ -14,6 +14,12 @@ export default function LoginPage(props: ILoginPageProps) {
     })
     console.log('res:', res)
   }
+
+  const handleLoginFacebook = async () => {
+    const res = await signIn('facebook')
+    console.log('facebook:', res)
+  }
+
   return (
     <div>
       <Head>
@@ -26,6 +32,7 @@ export default function LoginPage(props: ILoginPageProps) {
       </Head>
       <h1>Login Page</h1>
       <button onClick={handleLogin}>Login</button>
+      <button onClick={handleLoginFacebook}>Login Facebook</button>
     </div>
   )
 }
