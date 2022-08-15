@@ -82,8 +82,8 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         },
       }),
     ],
-    // refetchInterval: 1 * 24 * 60 * 60,
-    // secret: process.env.NEXTAUTH_SECRET,
+    refetchInterval: 1 * 24 * 60 * 60,
+    secret: process.env.NEXT_PUBLIC_SECRET,
     debug: true,
     session: {
       strategy: 'jwt' as SessionStrategy,
