@@ -131,7 +131,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
             deviceId: 'XXX-XX-XXX',
           })) as JWT & Record<string, string>
         }
-
+        console.log('token:', token)
         return token
       },
       session: async ({
@@ -142,6 +142,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         token: JWT
       }) => {
         session = { ...session, ...token } as Session
+        console.log('session:', session)
 
         return session
       },
