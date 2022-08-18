@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-export interface IHeaderProps {}
+export interface IFooterProps {}
 
-export function Header(props: IHeaderProps) {
-  return <div></div>
+export function Footer(props: IFooterProps) {
+  return <div>Footer</div>
 }

@@ -1,5 +1,6 @@
 import { fetchPosts } from '@/api-client'
 import Page from '@/components/page'
+import { PrimaryLayout } from '@/layouts'
 import { IPost, NextPageWithLayout } from '@/models'
 import {
   dehydrate,
@@ -54,6 +55,6 @@ export const getServerSideProps: GetServerSideProps = async (): Promise<{
 }
 
 export default Home
-// Home.getLayout = function getLayout(page: ReactElement) {
-//   return <div>{page}</div>
-// }
+Home.getLayout = function getLayout(page: ReactElement) {
+  return <PrimaryLayout>{page}</PrimaryLayout>
+}

@@ -43,7 +43,7 @@ class Http {
 
   initHttp() {
     const http = axios.create({
-      baseURL: isServer ? `${process.env.NEXT_PUBLIC_API_URL}/api` : '/api',
+      baseURL: isServer ? `${process.env.NEXT_PUBLIC_API_URL}` : '',
       headers: headers,
       paramsSerializer: params => queryString.stringify(params),
       timeout: 15000,

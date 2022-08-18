@@ -1,16 +1,19 @@
 import { GetServerSidePropsContext, Redirect } from 'next'
 import { getSession } from 'next-auth/react'
+const isProd = process.env.NODE_ENV === 'production'
 
 export const withAuth = (options: WrapperOptions) => (gssp: any) => {
   return async (context: GetServerSidePropsContext) => {
-    const session = await getSession(context)
-    const domain = context.req.headers.host
-    const pathName = 'https://' + domain + context.resolvedUrl
+    const { req, resolvedUrl } = context
+    const session = await getSession(context || { req })
+    const domain = req.headers.host
+    const destination = isProd ? 'https://' : 'http://' + domain + resolvedUrl
+    const callbackUrl = `/login?next=${encodeURIComponent(destination)}`
 
     if (options.isProtected && !session) {
       return {
         redirect: {
-          destination: `/login?next=${encodeURIComponent(pathName)}`,
+          destination: callbackUrl,
           permanent: false,
           ...options.redirect,
         },

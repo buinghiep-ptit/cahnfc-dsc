@@ -53,6 +53,10 @@ export default class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Livvic:wght@900&display=swap"
             rel="stylesheet"
           />
+          <link
+            href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+            rel="stylesheet"
+          />
           {/* Inject MUI styles first to match with the prepend: true configuration. */}
           {(this.props as any).emotionStyleTags}
         </Head>

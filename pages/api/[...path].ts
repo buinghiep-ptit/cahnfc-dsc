@@ -19,7 +19,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>,
 ) {
-  console.log('call proxy:')
+  console.log('caller proxy:')
 
   return new Promise((resolve, reject) => {
     //convert cookies to header Authorization

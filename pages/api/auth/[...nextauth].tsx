@@ -78,7 +78,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
           request,
         ): Promise<Omit<User, 'id'> | { id?: string | undefined } | null> {
           const payload = {
-            username: credentials!.email,
+            phoneNumber: credentials!.email,
             password: credentials!.password,
           }
           try {
@@ -107,6 +107,11 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
     jwt: {
       maxAge: 60 * 60,
     },
+    pages: {
+      signIn: '/auth/signin',
+      signOut: '/auth/signout',
+      error: '/auth/error', // Error code passed in query string as ?error=
+    },
     callbacks: {
       signIn: async ({
         user,
@@ -114,7 +119,19 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         profile,
         credentials,
       }: Record<string, unknown>) => {
+        if (account) {
+          // token.accessToken = account.access_token
+          // console.log('account signIn:', account)
+        }
+
         return true
+      },
+      async redirect({ url, baseUrl }: any) {
+        // Allows relative callback URLs
+        if (url.startsWith('/')) return `${baseUrl}${url}`
+        // Allows callback URLs on the same origin
+        else if (new URL(url).origin === baseUrl) return url
+        return baseUrl
       },
       register: async ({
         firstName,
@@ -131,14 +148,19 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         user?: User & Record<'accessToken' | 'refreshToken' | string, string>
         account?: any
       }) => {
+        console.log('user jwt:', user)
         if (user) {
-          token.accessToken = user.accessToken
-          token.expiredAt = user.expiredAt
-          token.refreshToken = user.refreshToken || null
+          // token.accessToken = user.accessToken
+          // token.expiredAt = user.expiredAt
+          // token.refreshToken = user.refreshToken || null
+          token = { ...token, ...user } as JWT
         }
 
         if (account) {
-          token.accessToken = account.access_token
+          token = { ...token, ...account } as JWT
+          // token.accessToken = account.access_token
+          //get token our services replace for social auth service here
+          console.log('account:', account)
         }
 
         const shouldRefreshTime = Math.round(

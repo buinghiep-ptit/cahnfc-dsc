@@ -1,5 +1,6 @@
 // import { authApi } from '@/api-client'
 import { getProfile } from '@/api-client'
+import { withAuth } from '@/HOCs'
 import { GetServerSidePropsContext } from 'next'
 import { getSession, useSession } from 'next-auth/react'
 import * as React from 'react'
@@ -11,8 +12,7 @@ export default function ProfilePage(props: IProfilePageProps) {
 
   const getProfileUser = async () => {
     try {
-      const res = await getProfile()
-      alert(res)
+      await getProfile()
     } catch (error) {
       alert(error)
     }
@@ -24,10 +24,21 @@ export default function ProfilePage(props: IProfilePageProps) {
     </div>
   )
 }
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+//   return {
+//     props: {
+//       session: await getSession(ctx),
+//     },
+//   }
+// }
+
+export const getServerSideProps = withAuth({
+  isProtected: true,
+})(async (context: GetServerSidePropsContext) => {
+  // Your normal `getServerSideProps` code here
   return {
     props: {
-      session: await getSession(ctx),
+      session: await getSession(context),
     },
   }
-}
+})

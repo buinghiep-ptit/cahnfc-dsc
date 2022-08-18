@@ -8,6 +8,14 @@ const nextConfig = {
         source: '/login',
         destination: '/auth/login', //
       },
+      {
+        source: '/product/api/:path*',
+        destination: '/api/:path*',
+      },
+      {
+        source: '/auth/api/:path*',
+        destination: '/api/:path*',
+      },
     ]
   },
   env: {

@@ -1,7 +1,9 @@
 import { withAuth } from '@/HOCs'
+import { PrimaryLayout } from '@/layouts'
 import { GetServerSidePropsContext } from 'next'
 import { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
+import { ReactElement } from 'react'
 
 const Protected = () => {
   const { data: session } = useSession()
@@ -22,3 +24,6 @@ export const getServerSideProps = withAuth({
 })
 
 export default Protected
+Protected.getLayout = function getLayout(page: ReactElement) {
+  return <PrimaryLayout>{page}</PrimaryLayout>
+}
