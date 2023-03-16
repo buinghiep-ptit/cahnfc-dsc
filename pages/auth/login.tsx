@@ -13,8 +13,8 @@ export default function LoginPage(props: ILoginPageProps) {
 
   const handleLogin = async () => {
     const res = await signIn('credentials', {
-      email: '0975452750',
-      password: 'nghiepbv2',
+      email: 'giangcm@fpt.com.vn',
+      password: 'abc123456',
       callbackUrl: next ? (next as string) : '',
     })
     console.log('res:', res)

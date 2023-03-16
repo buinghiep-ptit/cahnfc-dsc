@@ -80,7 +80,7 @@ function App({
                 </ThemeProvider>
               </StyledEngineProvider>
             </CacheProvider>
-            <ReactQueryDevtools initialIsOpen={false} />
+            <ReactQueryDevtools initialIsOpen={true} />
           </Hydrate>
         </QueryClientProvider>
       </ZustandProvider>

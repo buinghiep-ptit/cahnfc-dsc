@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { login, renewToken } from '@/api-client'
+import { loginUser, renewToken } from '@/api-client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import NextAuth, {
   NextAuthOptions,
@@ -78,13 +78,12 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
           request,
         ): Promise<Omit<User, 'id'> | { id?: string | undefined } | null> {
           const payload = {
-            phoneNumber: credentials!.email,
+            email: credentials!.email,
             password: credentials!.password,
           }
           try {
-            const user = await login(payload)
-
-            if (user.accessToken) {
+            const user = await loginUser({ ...payload, rememberMe: false })
+            if ((user as any).accessToken) {
               return user
             }
 
@@ -148,7 +147,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         user?: User & Record<'accessToken' | 'refreshToken' | string, string>
         account?: any
       }) => {
-        console.log('user jwt:', user)
+        console.log('jwt:', token)
         if (user) {
           // token.accessToken = user.accessToken
           // token.expiredAt = user.expiredAt
@@ -160,7 +159,6 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
           token = { ...token, ...account } as JWT
           // token.accessToken = account.access_token
           //get token our services replace for social auth service here
-          console.log('account:', account)
         }
 
         const shouldRefreshTime = Math.round(

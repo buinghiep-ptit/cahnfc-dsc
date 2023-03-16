@@ -6,7 +6,7 @@ import * as React from 'react'
 export function Header() {
   const { data: session } = useSession()
   const handleSignOut = async () => {
-    await signOut()
+    await signOut({ callbackUrl: window.location.href })
   }
   return (
     <Box>

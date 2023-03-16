@@ -18,7 +18,7 @@ export default function AboutPage({ posts }: IAboutPageProps) {
     ['posts'],
     fetchPosts,
   )
-  return <div></div>
+  return <div>About us page</div>
 }
 
 export async function getStaticProps() {
