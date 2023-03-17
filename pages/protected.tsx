@@ -11,7 +11,11 @@ const Protected = () => {
     <div>
       <h1>Protected page</h1>
       <strong>Signed in as</strong>:{' '}
-      <mark>{(session as Session & Record<string, string>).accessToken}</mark>
+      <mark>
+        {(session as Session & Record<string, string>).accessToken ||
+          (session as any).access_token}
+      </mark>
+      <p>auth info:{JSON.stringify(session)}</p>
     </div>
   )
 }
