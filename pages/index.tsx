@@ -37,7 +37,7 @@ const Home: NextPageWithLayout = () => {
     const privateKey =
       '-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgf0cdzc3hp39tqFSmo4mM+Oxdj+RQnXM/bOtb6Vxy9d+gCgYIKoZIzj0DAQehRANCAAQQTaikGQq6lSECCwvmNzCsuBA6cdbeDai9RJCub0ZyGrG92BpTlIrCQueuz7+b8qss7e6XU/no/1zrNNPkLXX4\n-----END PRIVATE KEY-----'
     const teamId = '5L2NM6YDYV'
-    const clientId = 'com.ftel.dsc.cahnfc'
+    const clientId = 'com.ftel.dsc.cahnfc.web'
     const keyId = 'LPWKW8D36B'
     const header = { alg: 'ES256', kid: keyId }
     const claims = {
