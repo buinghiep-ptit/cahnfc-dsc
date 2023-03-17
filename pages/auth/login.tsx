@@ -34,6 +34,11 @@ export default function LoginPage(props: ILoginPageProps) {
     console.log('google:', res)
   }
 
+  const handleLoginApple = async () => {
+    const res = await signIn('apple')
+    console.log('apple:', res)
+  }
+
   return (
     <div>
       <Head>
@@ -49,6 +54,7 @@ export default function LoginPage(props: ILoginPageProps) {
         <button onClick={handleLogin}>Login</button>
         <button onClick={handleLoginFacebook}>Login Facebook</button>
         <button onClick={handleLoginGoogle}>Login Google</button>
+        <button onClick={handleLoginApple}>Login Apple</button>
       </Box>
     </div>
   )

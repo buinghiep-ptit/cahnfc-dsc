@@ -11,6 +11,7 @@ import { JWT } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import FacebookProvider from 'next-auth/providers/facebook'
 import GoogleProvider from 'next-auth/providers/google'
+import AppleProvider from 'next-auth/providers/apple'
 
 const refreshAccessToken = async (
   payload: { refreshToken: string; deviceId: string } & Record<string, string>,
@@ -66,6 +67,10 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
             response_type: 'code',
           },
         },
+      }),
+      AppleProvider({
+        clientId: process.env.APPLE_CLIENT_ID as string,
+        clientSecret: process.env.APPLE_CLIENT_SECRET as string,
       }),
       CredentialsProvider({
         type: 'credentials',

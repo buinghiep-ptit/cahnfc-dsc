@@ -38,6 +38,7 @@
     "camelize": "^1.0.0",
     "cookies": "^0.8.0",
     "http-proxy": "^1.18.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "next": "12.2.3",
     "next-auth": "^4.10.3",
