@@ -1,19 +1,14 @@
 /* eslint-disable import/no-named-as-default-member */
-import { fetchPosts } from '@/api-client'
-import Page from '@/components/page'
+import { FMSwiperSlider } from '@/components/FMSwiperSilder'
+import { Matching } from '@/components/home/Matching'
+import { TrapezoidInfo } from '@/components/home/TrapezoidInfo'
 import { PrimaryLayout } from '@/layouts'
 import { IPost, NextPageWithLayout } from '@/models'
-import {
-  dehydrate,
-  DehydratedState,
-  QueryClient,
-  useQuery,
-  UseQueryResult,
-} from '@tanstack/react-query'
-import type { GetServerSideProps, NextPage } from 'next'
+import { Box, Container } from '@mui/material'
+import { dehydrate, DehydratedState, QueryClient } from '@tanstack/react-query'
+import type { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
-import { ReactElement, useEffect } from 'react'
-import jwt from 'jsonwebtoken'
+import { ReactElement, useState } from 'react'
 
 interface HomeProps {
   posts?: IPost[]
@@ -24,14 +19,16 @@ const Home: NextPageWithLayout = () => {
 
   const router = useRouter()
 
-  const { data }: UseQueryResult<IPost[], Error> = useQuery<IPost[], Error>(
-    ['posts'],
-    fetchPosts,
-  )
-  const { data: otherData }: UseQueryResult<IPost[], Error> = useQuery<
-    IPost[],
-    Error
-  >(['posts'], fetchPosts)
+  const [tabIndex, setTabIndex] = useState(0)
+
+  // const { data }: UseQueryResult<IPost[], Error> = useQuery<IPost[], Error>(
+  //   ['posts'],
+  //   fetchPosts,
+  // )
+  // const { data: otherData }: UseQueryResult<IPost[], Error> = useQuery<
+  //   IPost[],
+  //   Error
+  // >(['posts'], fetchPosts)
 
   // useEffect(() => {
   //   const privateKey =
@@ -57,9 +54,25 @@ const Home: NextPageWithLayout = () => {
   // }, [])
 
   return (
-    <>
-      <Page />
-    </>
+    <Box position={'relative'} bgcolor={'#ed1e24'}>
+      <FMSwiperSlider />
+
+      <Box
+        pt={9.5}
+        pb={6}
+        sx={{
+          textAlign: 'center',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundImage: 'url(/assets/images/home/bg-match.jpg)',
+        }}
+      >
+        <Container sx={{ position: 'relative' }}>
+          <TrapezoidInfo />
+          <Matching />
+        </Container>
+      </Box>
+    </Box>
   )
 }
 
@@ -67,9 +80,9 @@ export const getServerSideProps: GetServerSideProps = async (): Promise<{
   props: { dehydratedState: DehydratedState; initialZustandState?: any }
 }> => {
   const queryClient = new QueryClient()
-  if (!queryClient.getQueryData(['posts'])) {
-    await queryClient.prefetchQuery<IPost[]>(['posts'], fetchPosts)
-  }
+  // if (!queryClient.getQueryData(['posts'])) {
+  //   await queryClient.prefetchQuery<IPost[]>(['posts'], fetchPosts)
+  // }
 
   return {
     props: {

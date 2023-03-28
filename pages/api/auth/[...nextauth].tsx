@@ -106,10 +106,10 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
     debug: true,
     session: {
       strategy: 'jwt' as SessionStrategy,
-      maxAge: 60 * 60,
+      maxAge: 1 * 60,
     },
     jwt: {
-      maxAge: 60 * 60,
+      maxAge: 1 * 60,
     },
     pages: {
       signIn: '/auth/signin',

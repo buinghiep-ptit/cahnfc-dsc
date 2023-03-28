@@ -1,5 +1,5 @@
 import React from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import Seo from '@/components/commons/seo'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -10,6 +10,7 @@ export interface ILoginPageProps {}
 export default function LoginPage(props: ILoginPageProps) {
   const router = useRouter()
   const { next } = router.query
+  const { data: session, status } = useSession()
 
   const handleLogin = async () => {
     const res = await signIn('credentials', {
@@ -19,6 +20,7 @@ export default function LoginPage(props: ILoginPageProps) {
     })
     console.log('res:', res)
   }
+  console.log('status:', status)
 
   const handleLoginFacebook = async () => {
     const res = await signIn('facebook', {
@@ -30,6 +32,7 @@ export default function LoginPage(props: ILoginPageProps) {
   const handleLoginGoogle = async () => {
     const res = await signIn('google', {
       callbackUrl: next ? (next as string) : '',
+      // uselessWindow: true,
     })
     console.log('google:', res)
   }
@@ -50,6 +53,15 @@ export default function LoginPage(props: ILoginPageProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <h1>Login Page</h1>
+      {/* <div>
+        {loading ? (
+          <p>Loading...</p>
+        ) : session ? (
+          <p>You are already logged in.</p>
+        ) : (
+          <button onClick={() => signIn('google')}>Sign in with Google</button>
+        )}
+      </div> */}
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <button onClick={handleLogin}>Login</button>
         <button onClick={handleLoginFacebook}>Login Facebook</button>

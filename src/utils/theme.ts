@@ -20,7 +20,7 @@ export let theme = createTheme({
       xs: 0,
       sm: 600,
       md: 1000,
-      lg: 1200,
+      lg: 1224,
       xl: 1920,
     },
   },
@@ -31,8 +31,8 @@ export let theme = createTheme({
       },
       styleOverrides: {
         root: {
-          // paddingLeft: "0px!important",
-          // paddingRight: "0px!important",
+          // paddingLeft: '0px!important',
+          // paddingRight: '0px!important',
         },
         maxWidthSm: {
           // paddingLeft: "0px!important",
@@ -49,9 +49,9 @@ export let theme = createTheme({
           },
         },
         maxWidthLg: {
-          maxWidth: '1290px',
+          maxWidth: '1224px',
           '@media (min-width: 1025px)': {
-            maxWidth: '1290px',
+            maxWidth: '1224px',
           },
         },
       },
@@ -86,6 +86,9 @@ export let theme = createTheme({
       },
     },
     MuiButton: {
+      defaultProps: {
+        disableRipple: false,
+      },
       variants: [
         {
           props: {
@@ -100,6 +103,23 @@ export let theme = createTheme({
             background:
               'radial-gradient(88.39% 88.39% at 16.07% 11.61%, #FFBD70 0%, #FF7836 100%)',
             borderRadius: '100px',
+          },
+        },
+        {
+          props: {
+            variant: 'outlined',
+            color: 'primary',
+          },
+          style: {
+            textTransform: 'none',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            color: 'white',
+            fontSize: '1rem',
+            padding: '12px 32px',
+            borderRadius: '8px',
+            fontFamily: 'Avenir Next',
+            fontWeight: 600,
+            lineHeight: 1.5,
           },
         },
       ],
@@ -196,16 +216,16 @@ export let theme = createTheme({
       900: '#111827',
     },
     primary: {
-      main: '#FF7836',
+      main: '#FFFFFF',
       light: '#828DF8',
       dark: '#3832A0',
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#10B981',
+      main: '#212529',
       light: '#3FC79A',
       dark: '#0B815A',
-      contrastText: '#FFFFFF',
+      contrastText: '#868E96',
     },
     success: {
       main: '#14B8A6',
@@ -245,7 +265,7 @@ export let theme = createTheme({
     },
     divider: '#E6E8F0',
     text: {
-      primary: '#101426',
+      primary: '#FFFFFF',
       secondary: '#65748B',
       disabled: 'rgba(55, 65, 81, 0.48)',
     },
@@ -279,12 +299,15 @@ export let theme = createTheme({
   ],
   typography: {
     allVariants: {
-      fontFamily: ['Inter', 'sans-serif'].join(','),
+      fontFamily: ['Avenir Next', 'sans-serif'].join(','),
+      color: '#FFFFFF',
     },
     button: {
       fontWeight: 900,
     },
     fontFamily: [
+      'Avenir Next',
+      'UTM Bebas',
       'Inter',
       'sans-serif',
       'Caveat cursive',
@@ -294,7 +317,6 @@ export let theme = createTheme({
       fontSize: '1rem',
       fontWeight: 400,
       lineHeight: 1.75,
-      color: '#323E5D',
     },
     body2: {
       fontSize: '0.875rem',
@@ -302,16 +324,14 @@ export let theme = createTheme({
       lineHeight: 1.57,
     },
     subtitle1: {
-      fontSize: '1rem',
-      fontWeight: 500,
-      lineHeight: 1.75,
-      color: '#101426',
+      fontSize: '0.9375rem',
+      fontWeight: 600,
+      lineHeight: 1.6,
     },
     subtitle2: {
       fontSize: '0.875rem',
-      fontWeight: 400,
-      lineHeight: 1.25,
-      color: '#475985',
+      fontWeight: 500,
+      lineHeight: 1.5,
     },
     overline: {
       fontSize: '0.75rem',
@@ -331,30 +351,35 @@ export let theme = createTheme({
       lineHeight: 1.375,
     },
     h2: {
-      fontWeight: 700,
+      fontFamily: 'UTM Bebas',
+      fontWeight: 400,
       fontSize: '3rem',
-      lineHeight: 1.375,
+      lineHeight: 1.25,
     },
     h3: {
-      fontWeight: 700,
+      fontFamily: 'UTM Bebas',
+      fontWeight: 400,
       fontSize: '2.25rem',
-      lineHeight: 1.375,
+      lineHeight: 1.25,
     },
     h4: {
-      fontWeight: 700,
-      fontSize: '2rem',
+      fontFamily: 'UTM Bebas',
+      fontWeight: 400,
+      fontSize: '1.875rem',
       lineHeight: 1.375,
     },
     h5: {
-      fontWeight: 600,
-      fontSize: '1.5rem',
+      fontFamily: 'UTM Bebas',
+      fontWeight: 400,
+      fontSize: '1.375rem',
       lineHeight: 1.375,
     },
     h6: {
-      fontWeight: 600,
+      fontFamily: 'UTM Bebas',
+      fontWeight: 400,
       fontSize: '1.125rem',
-      lineHeight: 1.375,
-      color: '#101426',
+      lineHeight: 1.25,
+      letterSpacing: '1px',
     },
   },
 } as IThemeOptions)

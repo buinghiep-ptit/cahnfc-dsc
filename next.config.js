@@ -24,6 +24,16 @@ const nextConfig = {
   // eslint: {
   //   dirs: ['apis', 'components', 'hooks', 'layouts', 'pages', 'store', 'types'],
   // },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+        module: false,
+      }
+    }
+
+    return config
+  },
 }
 
 module.exports = nextConfig

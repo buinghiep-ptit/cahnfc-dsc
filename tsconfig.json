@@ -23,6 +23,14 @@
       "@/api/*": ["./api-client/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/lib/gtag.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "src/lib/gtag.js",
+    "src/assets/theme/index.js"
+  ],
   "exclude": ["node_modules"]
 }

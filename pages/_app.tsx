@@ -16,7 +16,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { SessionProvider } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
-import '../styles/globals.css'
+import '../styles/globals.scss'
 const isProd = process.env.NODE_ENV === 'production'
 
 // Client-side cache, shared for the whole session of the user in the browser.
