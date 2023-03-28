@@ -80,8 +80,8 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
           password: { label: 'Password', type: 'password' },
         },
         async authorize(
-          credentials: Record<'email' | 'password', string> | undefined,
-          req: Pick<RequestInternal, 'body' | 'query' | 'headers' | 'method'>,
+          credentials: any, //Record<'email' | 'password', string> | undefined,
+          req: any, //Pick<RequestInternal, 'body' | 'query' | 'headers' | 'method'>,
         ): Promise<Omit<User, 'id'> | { id?: string | undefined } | null> {
           const payload = {
             email: credentials!.email,
