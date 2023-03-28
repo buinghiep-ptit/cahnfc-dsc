@@ -127,7 +127,7 @@ export function CustomDropdown({
         {collapse?.map((c, index) => (
           <Link key={index} href={c.route ?? ''} passHref>
             <MenuItem onClick={() => handleClose(c.callBack)}>
-              <Typography variant="subtitle1" color={'secondary'}>
+              <Typography variant="subtitle2" color={'secondary'}>
                 {c.name}
               </Typography>
             </MenuItem>

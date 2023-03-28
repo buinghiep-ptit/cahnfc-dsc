@@ -79,10 +79,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
           email: { label: 'Email', type: 'text' },
           password: { label: 'Password', type: 'password' },
         },
-        async authorize(
-          credentials: any, //Record<'email' | 'password', string> | undefined,
-          req: any, //Pick<RequestInternal, 'body' | 'query' | 'headers' | 'method'>,
-        ): Promise<Omit<User, 'id'> | { id?: string | undefined } | null> {
+        authorize: async (credentials, _req) => {
           const payload = {
             email: credentials!.email,
             password: credentials!.password,

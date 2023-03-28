@@ -82,6 +82,7 @@ export function MUICarousel<T>({
                     ? 'invert(0%) sepia(99%) saturate(15%) hue-rotate(13deg) brightness(94%) contrast(100%)'
                     : 'invert(100%) sepia(100%) saturate(0%) hue-rotate(84deg) brightness(111%) contrast(101%)',
               }}
+              alt="icon"
             />
           </motion.button>
           <motion.button
@@ -100,13 +101,14 @@ export function MUICarousel<T>({
             <Image
               src={'/assets/images/vuesax/arrow-right.svg'}
               width={24}
+              height={24}
               style={{
                 filter:
                   activeIndex < dotsLen - 1
                     ? 'invert(0%) sepia(99%) saturate(15%) hue-rotate(13deg) brightness(94%) contrast(100%)'
                     : 'invert(100%) sepia(100%) saturate(0%) hue-rotate(84deg) brightness(111%) contrast(101%)',
               }}
-              height={24}
+              alt="icon"
             />
           </motion.button>
         </Stack>
