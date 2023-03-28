@@ -2,19 +2,22 @@ import { withAuth } from '@/HOCs'
 import { PrimaryLayout } from '@/layouts'
 import { GetServerSidePropsContext } from 'next'
 import { Session } from 'next-auth'
-import { useSession } from 'next-auth/react'
-import { ReactElement } from 'react'
+import { getSession, useSession } from 'next-auth/react'
+import { ReactElement, useEffect } from 'react'
 
 const Protected = () => {
   const { data: session } = useSession()
+  useEffect(() => {
+    ;(async () => {
+      const s = await getSession()
+      console.log('ss:', s)
+    })()
+  }, [])
   return (
     <div>
       <h1>Protected page</h1>
       <strong>Signed in as</strong>:{' '}
-      <mark>
-        {(session as Session & Record<string, string>).accessToken ||
-          (session as any).access_token}
-      </mark>
+      <mark>{session && (session as any)?.accessToken}</mark>
       <p>auth info:{JSON.stringify(session)}</p>
     </div>
   )

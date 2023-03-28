@@ -147,20 +147,22 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         account,
       }: {
         token: JWT
-        user?: User & Record<'accessToken' | 'refreshToken' | string, string>
+        user?: User
         account?: any
       }) => {
-        console.log('jwt:', token)
-        if (user) {
-          // token.accessToken = user.accessToken
+        console.log('acc:', account)
+        console.log('user:', user)
+
+        if (user && account) {
+          token.accessToken = user.accessToken
           // token.expiredAt = user.expiredAt
           // token.refreshToken = user.refreshToken || null
-          token = { ...token, ...user } as JWT
+          token = { ...token, ...user }
         }
 
-        if (account) {
-          token = { ...token, ...account } as JWT
-          // token.accessToken = account.access_token
+        if (account && account.access_token) {
+          // token = { ...token, ...account }
+          token.accessToken = account.access_token
           //get token our services replace for social auth service here
         }
 
@@ -178,13 +180,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
 
         return token
       },
-      session: async ({
-        session,
-        token,
-      }: {
-        session: Session & { accessToken?: string }
-        token: JWT
-      }) => {
+      session: async ({ session, token }: { session: Session; token: JWT }) => {
         session = { ...session, ...token } as Session
 
         return session
