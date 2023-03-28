@@ -72,13 +72,11 @@ export function FMSwiperSlider(props: Props) {
             {index === 0 ? (
               <Video />
             ) : (
-              <img
+              <Image
                 src={images[index]}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
+                // width={'100%'}
+                // height={'100%'}
+                layout="fill"
                 alt="slide"
               />
             )}
@@ -119,7 +117,7 @@ export function FMSwiperSlider(props: Props) {
           <Typography variant="h4" sx={{ letterSpacing: '1px' }}>
             MỤC TIÊU CỦA ĐỨC LÀ GHI THẬT NHIỀU BÀN THẮNG
           </Typography>
-          {index === 1 && (
+          {index === 0 && (
             <Button sx={{ width: 200 }} variant="outlined">
               Xem video
             </Button>

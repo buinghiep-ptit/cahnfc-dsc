@@ -99,7 +99,7 @@ export function TrapezoidInfo(props: IProps) {
               flexDirection={'row'}
               justifyContent="space-between"
               width="100%"
-              px={3.5}
+              px={tabIndex === 0 ? 9 : 3.5}
             >
               {tabIndex === 0 && (
                 <>
@@ -193,6 +193,7 @@ export function TrapezoidInfo(props: IProps) {
           <JustifyBox
             gap={7}
             py={5}
+            px={2}
             sx={{
               width: 'calc(60vw - 60px)',
               bgcolor: '#FFFFFF',

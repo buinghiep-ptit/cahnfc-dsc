@@ -1,5 +1,6 @@
 import { IMatch } from '@/models'
 import { Box, Stack, styled, Typography } from '@mui/material'
+import moment from 'moment'
 import Image from 'next/image'
 import * as React from 'react'
 import { MUICarousel } from '../MUICarousel'
@@ -37,22 +38,30 @@ export function Matching(props: IProps) {
               Math.floor(Math.random() * 4) + 1
             }.svg`,
           },
+          {
+            id: 2,
+            name: 'SLNA FC',
+            goalRound: Math.floor(Math.random() * 10) + 1,
+            logo: `/assets/images/logos/logo-${
+              Math.floor(Math.random() * 4) + 1
+            }.svg`,
+          },
         ],
       })),
   )
 
-  const renderItem = () => {
+  const renderItem = (item: IMatch) => {
     return (
       <ItemContainer>
         <Typography
           variant="subtitle2"
           sx={{
             padding: '12px 16px',
-            backgroundColor: '#212529',
+            backgroundColor: item.status === 1 ? '#212529' : '#ED1E24',
             textAlign: 'start',
           }}
         >
-          05/03/2023, SVĐ Hàng Đẫy
+          {moment(item.dateStart).format('DD/MM/YYYY')}, {item.stadium}
         </Typography>
 
         <JustifyBox flexDirection={'row'} py={2.5} gap={4} px={3}>
@@ -64,7 +73,7 @@ export function Matching(props: IProps) {
               height={80}
             />
             <Typography variant="h6" color={'secondary'}>
-              CAHN FC
+              {item?.teams && item?.teams[0]?.name}
             </Typography>
           </JustifyBox>
 
@@ -83,15 +92,15 @@ export function Matching(props: IProps) {
               }
             >
               <Typography variant="h3" color={'secondary'}>
-                0
+                {item?.teams && item?.teams[0]?.goalRound}
               </Typography>
 
               <Typography variant="h3" color={'secondary'}>
-                1
+                {item?.teams && item?.teams[1]?.goalRound}
               </Typography>
             </Stack>
             <Typography variant="subtitle2" sx={{ color: '#ED1E24' }}>
-              V League
+              {item.league}
             </Typography>
           </JustifyBox>
           <JustifyBox flexDirection={'column'} gap={1}>
@@ -102,7 +111,7 @@ export function Matching(props: IProps) {
               height={80}
             />
             <Typography variant="h6" color={'secondary'}>
-              SLNA FC
+              {item?.teams && item?.teams[1]?.name}
             </Typography>
           </JustifyBox>
         </JustifyBox>
@@ -111,8 +120,14 @@ export function Matching(props: IProps) {
   }
   return (
     <>
-      <MUICarousel items={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}>
-        {renderItem()}
+      <MUICarousel title="Trận đấu" titleColor="light">
+        <>
+          {items.map((item, index) => (
+            <div className="item" key={index}>
+              {renderItem(item)}
+            </div>
+          ))}
+        </>
       </MUICarousel>
     </>
   )

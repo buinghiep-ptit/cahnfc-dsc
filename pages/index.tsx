@@ -1,6 +1,7 @@
 /* eslint-disable import/no-named-as-default-member */
 import { FMSwiperSlider } from '@/components/FMSwiperSilder'
 import { Matching } from '@/components/home/Matching'
+import { News } from '@/components/home/News'
 import { TrapezoidInfo } from '@/components/home/TrapezoidInfo'
 import { PrimaryLayout } from '@/layouts'
 import { IPost, NextPageWithLayout } from '@/models'
@@ -70,6 +71,17 @@ const Home: NextPageWithLayout = () => {
         <Container sx={{ position: 'relative' }}>
           <TrapezoidInfo />
           <Matching />
+        </Container>
+      </Box>
+
+      <Box
+        py={8}
+        sx={{
+          bgcolor: '#ffffff',
+        }}
+      >
+        <Container sx={{ position: 'relative' }}>
+          <News />
         </Container>
       </Box>
     </Box>

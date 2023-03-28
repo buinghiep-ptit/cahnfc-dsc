@@ -4,11 +4,18 @@ import Image from 'next/image'
 import * as React from 'react'
 
 export interface Props<T> {
-  items: T[]
+  items?: T[]
+  title?: string
+  titleColor?: 'light' | 'dark'
   children?: React.ReactElement
 }
 
-export function MUICarousel<T>({ items, children }: Props<T>) {
+export function MUICarousel<T>({
+  items,
+  titleColor,
+  title,
+  children,
+}: Props<T>) {
   const cRef = React.useRef(null)
   const carousel = React.useRef(null)
   const [w, setW] = React.useState(0)
@@ -46,15 +53,21 @@ export function MUICarousel<T>({ items, children }: Props<T>) {
         justifyContent="space-between"
         alignItems={'center'}
       >
-        <Typography variant="h2">Trận đấu</Typography>
+        <Typography
+          variant="h2"
+          color={titleColor === 'light' ? 'primary' : 'secondary'}
+        >
+          {title}
+        </Typography>
         <Stack direction={'row'} justifyContent={'space-between'} gap={2}>
           <motion.button
             style={{
               padding: '8px',
-              backgroundColor: activeIndex > 0 ? '#212529' : '#FFFFFF',
+              backgroundColor: activeIndex > 0 ? '#212529' : '#E9ECEF',
               borderRadius: 100,
               display: 'flex',
               border: 'none',
+              cursor: 'pointer',
             }}
             whileTap={{ scale: 0.8 }}
             onClick={e => handleLeftClick(e)}
@@ -75,10 +88,11 @@ export function MUICarousel<T>({ items, children }: Props<T>) {
             style={{
               padding: '8px',
               backgroundColor:
-                activeIndex < dotsLen - 1 ? '#212529' : '#FFFFFF',
+                activeIndex < dotsLen - 1 ? '#212529' : '#E9ECEF',
               borderRadius: 100,
               display: 'flex',
               border: 'none',
+              cursor: 'pointer',
             }}
             whileTap={{ scale: 0.8 }}
             onClick={e => handleRightClick(e)}
@@ -98,16 +112,9 @@ export function MUICarousel<T>({ items, children }: Props<T>) {
         </Stack>
       </Stack>
       <div className="container" ref={cRef} style={{ width: w || '100%' }}>
-        <div className="carousel" ref={carousel}>
-          {items.map((num, index) => {
-            //   const { id, name, price, oldPrice, image } = item
-            return (
-              <div className="item" key={index}>
-                {children}
-              </div>
-            )
-          })}
-        </div>
+        <Stack direction={'row'} className="carousel" ref={carousel}>
+          {children}
+        </Stack>
       </div>
 
       <Stack direction={'row'} gap={1} justifyContent="center">

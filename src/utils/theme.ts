@@ -100,9 +100,9 @@ export let theme = createTheme({
             color: 'white',
             fontSize: '1rem',
             padding: '8px 24px',
-            background:
-              'radial-gradient(88.39% 88.39% at 16.07% 11.61%, #FFBD70 0%, #FF7836 100%)',
-            borderRadius: '100px',
+            background: '#ED1E24',
+            borderRadius: '8px',
+            lineHeight: 1.5,
           },
         },
         {
@@ -218,7 +218,7 @@ export let theme = createTheme({
     primary: {
       main: '#FFFFFF',
       light: '#828DF8',
-      dark: '#3832A0',
+      dark: '#868E96',
       contrastText: '#FFFFFF',
     },
     secondary: {

@@ -142,7 +142,7 @@ a {
   // min-width: 100vw;
 }
 .container .carousel {
-  display: flex;
+  // display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
   pointer-events: none;
@@ -153,13 +153,11 @@ a {
 }
 
 .container .carousel .item {
-  background-color: white;
-  margin-right: 20px;
-  // padding: 10px;
-  // width: 304px;
+  margin-right: 24px;
   border-radius: 16px;
   flex: none;
   pointer-events: all;
+  cursor: pointer;
 }
 
 .container .carousel .item .image img {
