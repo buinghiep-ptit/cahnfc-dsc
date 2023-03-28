@@ -2,6 +2,7 @@
 import { FMSwiperSlider } from '@/components/FMSwiperSilder'
 import { Matching } from '@/components/home/Matching'
 import { News } from '@/components/home/News'
+import { Products } from '@/components/home/Products'
 import { TrapezoidInfo } from '@/components/home/TrapezoidInfo'
 import { PrimaryLayout } from '@/layouts'
 import { IPost, NextPageWithLayout } from '@/models'
@@ -84,6 +85,7 @@ const Home: NextPageWithLayout = () => {
           <News />
         </Container>
       </Box>
+      <Products />
     </Box>
   )
 }
