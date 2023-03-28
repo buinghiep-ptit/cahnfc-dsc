@@ -150,30 +150,25 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         user?: User
         account?: any
       }) => {
-        console.log('acc:', account)
-        console.log('user:', user)
-
-        if (user && account) {
-          token.accessToken = user.accessToken
+        if (user) {
           // token.expiredAt = user.expiredAt
           // token.refreshToken = user.refreshToken || null
           token = { ...token, ...user }
         }
 
-        if (account && account.access_token) {
-          // token = { ...token, ...account }
-          token.accessToken = account.access_token
+        if (account) {
+          token = { ...token, ...account }
           //get token our services replace for social auth service here
         }
 
         const shouldRefreshTime = Math.round(
-          (token.expiredAt as number) - 30 * 60 * 1000 - Date.now(), // 30 minutes
+          ((token as any)?.expiredAt as number) - 30 * 60 * 1000 - Date.now(), // 30 minutes
         )
         if (shouldRefreshTime > 0) return token
 
-        if (token.refreshToken) {
+        if ((token as any)?.refreshToken) {
           token = (await refreshAccessToken({
-            refreshToken: token.refreshToken as string,
+            refreshToken: (token as any).refreshToken as string,
             deviceId: 'XXX-XX-XXX',
           })) as JWT & Record<string, string>
         }
