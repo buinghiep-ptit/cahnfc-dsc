@@ -3,6 +3,7 @@ import { loginUser, renewToken } from '@/api-client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import NextAuth, {
   NextAuthOptions,
+  RequestInternal,
   Session,
   SessionStrategy,
   User,
@@ -80,7 +81,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         },
         async authorize(
           credentials: Record<'email' | 'password', string> | undefined,
-          request,
+          req: Pick<RequestInternal, 'body' | 'query' | 'headers' | 'method'>,
         ): Promise<Omit<User, 'id'> | { id?: string | undefined } | null> {
           const payload = {
             email: credentials!.email,
