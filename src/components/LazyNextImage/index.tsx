@@ -75,7 +75,7 @@ export const LazyNextImage = ({ imgUrl, canHover = true }: IProps) => {
         onLoad={handleOnLoad}
         style={style}
       />
-      {showOverlay && canHover && <div className="overlay"></div>}
+      {showOverlay && canHover && !loading && <div className="overlay"></div>}
     </Wrapper>
   )
 }

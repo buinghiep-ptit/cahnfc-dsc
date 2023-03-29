@@ -8,8 +8,6 @@ import { TrapezoidInfo } from '@/components/home/TrapezoidInfo'
 import { PrimaryLayout } from '@/layouts'
 import { IPost, NextPageWithLayout } from '@/models'
 import { Box, Container } from '@mui/material'
-import { dehydrate, DehydratedState, QueryClient } from '@tanstack/react-query'
-import type { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
 
@@ -99,22 +97,6 @@ const Home: NextPageWithLayout = () => {
       </Box>
     </Box>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async (): Promise<{
-  props: { dehydratedState: DehydratedState; initialZustandState?: any }
-}> => {
-  const queryClient = new QueryClient()
-  // if (!queryClient.getQueryData(['posts'])) {
-  //   await queryClient.prefetchQuery<IPost[]>(['posts'], fetchPosts)
-  // }
-
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-      // initialZustandState: { count: 2 },
-    },
-  }
 }
 
 export default Home

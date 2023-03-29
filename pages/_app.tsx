@@ -1,7 +1,6 @@
 import { RefreshTokenHandler } from '@/helpers/refreshTokenHandler'
 import * as gtag from '@/lib/gtag'
 import { AppPropsWithLayout, GetLayout } from '@/models'
-import { useCreateStore, ZustandProvider } from '@/store'
 import { createEmotionCache, theme } from '@/utils'
 import { CacheProvider, EmotionCache } from '@emotion/react'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -34,7 +33,6 @@ function App({
 }: AppProps) {
   const router = useRouter()
   const [interval, setInterval] = useState<number>(0)
-  const createStore = useCreateStore(pageProps.initialZustandState)
   const [queryClient] = useState<QueryClient>(
     () =>
       new QueryClient({
@@ -69,24 +67,22 @@ function App({
       session={pageProps.session as any}
       refetchInterval={interval}
     >
-      <ZustandProvider createStore={createStore}>
-        <QueryClientProvider client={queryClient}>
-          <Hydrate state={pageProps.dehydratedState}>
-            <CacheProvider value={emotionCache}>
-              <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={theme}>
-                  <CssBaseline />
-                  <Box sx={{ visibility: mounted ? 'visible' : 'hidden' }}>
-                    {getLayout(<Component {...pageProps} />)}
-                    <RefreshTokenHandler setInterval={setInterval} />
-                  </Box>
-                </ThemeProvider>
-              </StyledEngineProvider>
-            </CacheProvider>
-            <ReactQueryDevtools initialIsOpen={true} />
-          </Hydrate>
-        </QueryClientProvider>
-      </ZustandProvider>
+      <QueryClientProvider client={queryClient}>
+        <Hydrate state={pageProps.dehydratedState}>
+          <CacheProvider value={emotionCache}>
+            <StyledEngineProvider injectFirst>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <Box sx={{ visibility: mounted ? 'visible' : 'hidden' }}>
+                  {getLayout(<Component {...pageProps} />)}
+                  <RefreshTokenHandler setInterval={setInterval} />
+                </Box>
+              </ThemeProvider>
+            </StyledEngineProvider>
+          </CacheProvider>
+          <ReactQueryDevtools initialIsOpen={true} />
+        </Hydrate>
+      </QueryClientProvider>
     </SessionProvider>
   )
 }
