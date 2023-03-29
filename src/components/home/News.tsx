@@ -3,6 +3,8 @@ import { Box, Button, Stack, styled, Typography } from '@mui/material'
 import moment from 'moment'
 import Image from 'next/image'
 import * as React from 'react'
+import { ImageLazy } from '../ImageLazy'
+import { LazyNextImage } from '../LazyNextImage'
 import { MUICarousel } from '../MUICarousel'
 
 export const JustifyBox = styled(Box)(() => ({
@@ -64,13 +66,14 @@ export function News(props: IProps) {
             borderRadius: '12px',
           }}
         >
-          <Image
+          {/* <Image
             src={item.thumb ?? ''}
             alt="logo 1"
             // width={'100%'}
             // height={'100%'}
             layout="fill"
-          />
+          /> */}
+          <LazyNextImage imgUrl={item.thumb ?? ''} />
           <Typography
             variant="subtitle2"
             color={'secondary'}

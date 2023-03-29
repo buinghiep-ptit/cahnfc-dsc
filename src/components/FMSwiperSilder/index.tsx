@@ -1,8 +1,9 @@
 import { Box, Button, IconButton, Stack, Typography } from '@mui/material'
-import * as React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Video } from '../Video'
 import Image from 'next/image'
+import * as React from 'react'
+import { LazyNextImage } from '../LazyNextImage'
+import { Video } from '../Video'
 
 export interface Props {}
 const images = [
@@ -72,13 +73,7 @@ export function FMSwiperSlider(props: Props) {
             {index === 0 ? (
               <Video />
             ) : (
-              <Image
-                src={images[index]}
-                // width={'100%'}
-                // height={'100%'}
-                layout="fill"
-                alt="slide"
-              />
+              <LazyNextImage imgUrl={images[index] ?? ''} canHover={false} />
             )}
           </motion.div>
         </AnimatePresence>

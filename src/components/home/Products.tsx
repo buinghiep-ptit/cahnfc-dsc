@@ -4,6 +4,7 @@ import { CurrencyFormatter } from '@/utils'
 import { Box, Container, Stack, styled, Typography } from '@mui/material'
 import Image from 'next/image'
 import * as React from 'react'
+import { LazyNextImage } from '../LazyNextImage'
 import { MUICarousel } from '../MUICarousel'
 
 const ItemContainer = styled(Box)<IProps>({
@@ -48,7 +49,7 @@ export function Products(props: IProps) {
             borderRadius: '12px 12px 0 0',
           }}
         >
-          <Image src={item.thumb ?? ''} alt="logo 1" layout="fill" />
+          <LazyNextImage imgUrl={item.thumb ?? ''} />
         </Box>
         <Stack direction={'column'} px={2.5} py={2}>
           <Typography

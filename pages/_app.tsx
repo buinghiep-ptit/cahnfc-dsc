@@ -65,7 +65,10 @@ function App({
   }, [router.events])
 
   return (
-    <SessionProvider session={pageProps.session} refetchInterval={interval}>
+    <SessionProvider
+      session={pageProps.session as any}
+      refetchInterval={interval}
+    >
       <ZustandProvider createStore={createStore}>
         <QueryClientProvider client={queryClient}>
           <Hydrate state={pageProps.dehydratedState}>

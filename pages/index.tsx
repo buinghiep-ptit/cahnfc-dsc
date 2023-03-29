@@ -1,5 +1,6 @@
 /* eslint-disable import/no-named-as-default-member */
 import { FMSwiperSlider } from '@/components/FMSwiperSilder'
+import { CAHNTV } from '@/components/home/CAHNTV'
 import { Matching } from '@/components/home/Matching'
 import { News } from '@/components/home/News'
 import { Products } from '@/components/home/Products'
@@ -86,6 +87,16 @@ const Home: NextPageWithLayout = () => {
         </Container>
       </Box>
       <Products />
+      <Box
+        py={8}
+        sx={{
+          bgcolor: '#ffffff',
+        }}
+      >
+        <Container sx={{ position: 'relative' }}>
+          <CAHNTV />
+        </Container>
+      </Box>
     </Box>
   )
 }
