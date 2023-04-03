@@ -127,24 +127,45 @@ export let theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          // "& .MuiOutlinedInput-notchedOutline": {
-          //   border: `5px solid green`,
-          // },
+          '& .MuiOutlinedInput-notchedOutline': {
+            border: 'none', //`5px solid green`,
+          },
+          padding: 0,
           borderRadius: '12px',
           minHeight: '48px',
           '&:hover': {
             '& .MuiOutlinedInput-notchedOutline': {
-              border: `1px solid #FF7836`,
+              border: `1px solid #ED1E24`,
             },
           },
           '&.Mui-focused': {
             '& .MuiOutlinedInput-notchedOutline': {
-              border: `1px solid #FF7836`,
+              border: `1px solid #ED1E24`,
             },
+            background: '#FFFFFF',
           },
         },
         input: {
-          padding: '0 16px',
+          padding: '0 44px 0 16px',
+          paddingTop: '4px',
+          fontSize: '1rem',
+          fontWeight: 500,
+          height: '48px',
+          color: '#212529',
+          border: 'none',
+          outline: 'none',
+          backgroundColor: 'transparent',
+          '&::placeholder': {
+            fontSize: '16px!important',
+            fontWeight: 500,
+            opacity: 1,
+            color: '#868E96',
+          },
+          '&:-webkit-autofill': {
+            WebkitBoxShadow: '0 0 0 100px #F5F7FA inset',
+            WebkitTextFillColor: '#868E96',
+            border: 'none',
+          },
         },
         notchedOutline: {
           borderColor: '#D8E0F3', // instead for .MuiOutlinedInput-notchedOutline
@@ -218,11 +239,11 @@ export let theme = createTheme({
     primary: {
       main: '#FFFFFF',
       light: '#828DF8',
-      dark: '#868E96',
+      dark: '#DA6868',
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#212529',
+      main: '#495057',
       light: '#3FC79A',
       dark: '#0B815A',
       contrastText: '#868E96',
@@ -316,7 +337,7 @@ export let theme = createTheme({
     body1: {
       fontSize: '1rem',
       fontWeight: 400,
-      lineHeight: 1.75,
+      lineHeight: 1.5,
     },
     body2: {
       fontSize: '0.875rem',
@@ -346,9 +367,10 @@ export let theme = createTheme({
       lineHeight: 1.66,
     },
     h1: {
-      fontWeight: 700,
-      fontSize: '3.5rem',
-      lineHeight: 1.375,
+      fontFamily: 'UTM Bebas',
+      fontWeight: 400,
+      fontSize: '7.5rem',
+      lineHeight: 1.25,
     },
     h2: {
       fontFamily: 'UTM Bebas',

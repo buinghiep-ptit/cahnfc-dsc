@@ -3,7 +3,7 @@ import { Box, Stack, styled, Typography } from '@mui/material'
 import moment from 'moment'
 import Image from 'next/image'
 import * as React from 'react'
-import { MUICarousel } from '../MUICarousel'
+import { MUICarousel } from '../commons/MUICarousel'
 
 export const JustifyBox = styled(Box)(() => ({
   display: 'flex',
@@ -15,6 +15,7 @@ const ItemContainer = styled(Box)<IProps>({
   borderRadius: '12px',
   backgroundColor: '#FFFFFF',
   overflow: 'hidden',
+  cursor: 'pointer',
 })
 
 export interface IProps {}
@@ -80,22 +81,18 @@ export function Matching(props: IProps) {
           <JustifyBox flexDirection={'column'} gap={1}>
             <Stack
               direction={'row'}
-              bgcolor={'#F1F3F5'}
+              bgcolor={'#212529'}
               borderRadius="12px"
               gap={1.5}
               px={2}
               pb={0.5}
-              divider={
-                <Typography variant="h3" color={'secondary'}>
-                  -
-                </Typography>
-              }
+              divider={<Typography variant="h3">-</Typography>}
             >
-              <Typography variant="h3" color={'secondary'}>
+              <Typography variant="h3">
                 {item?.teams && item?.teams[0]?.goalRound}
               </Typography>
 
-              <Typography variant="h3" color={'secondary'}>
+              <Typography variant="h3">
                 {item?.teams && item?.teams[1]?.goalRound}
               </Typography>
             </Stack>

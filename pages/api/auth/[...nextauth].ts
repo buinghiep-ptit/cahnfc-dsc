@@ -3,16 +3,15 @@ import { loginUser, renewToken } from '@/api-client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import NextAuth, {
   NextAuthOptions,
-  RequestInternal,
   Session,
   SessionStrategy,
   User,
 } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
+import AppleProvider from 'next-auth/providers/apple'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import FacebookProvider from 'next-auth/providers/facebook'
 import GoogleProvider from 'next-auth/providers/google'
-import AppleProvider from 'next-auth/providers/apple'
 
 const refreshAccessToken = async (
   payload: { refreshToken: string; deviceId: string } & Record<string, string>,

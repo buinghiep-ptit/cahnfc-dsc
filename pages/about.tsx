@@ -4,9 +4,9 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import * as React from 'react'
 
-const Header = dynamic(() => import('@/components/commons/header'), {
-  ssr: false,
-})
+// const Header = dynamic(() => import('@/components/commons/header'), {
+//   ssr: false,
+// })
 export interface IAboutPageProps {
   posts?: IPost[]
 }
@@ -25,7 +25,7 @@ export default function AboutPage({ posts }: IAboutPageProps) {
   return (
     <div>
       About us page
-      <Header />
+      {/* <Header /> */}
     </div>
   )
 }

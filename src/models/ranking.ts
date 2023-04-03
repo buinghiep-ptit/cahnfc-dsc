@@ -5,4 +5,5 @@ export interface IRank {
   roundNum?: number
   point?: number
   goalRound?: number
+  isMyTeam?: boolean
 }

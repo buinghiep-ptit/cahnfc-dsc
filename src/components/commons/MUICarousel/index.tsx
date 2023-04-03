@@ -24,11 +24,21 @@ export function MUICarousel<T>({
 
   React.useEffect(() => {
     const x = (cRef as any).current.offsetWidth
-    console.log('len:', (carousel as any).current.scrollWidth / x)
     setDotsLen(Math.ceil((carousel as any).current.scrollWidth / x))
     const offsetEdge = window.innerWidth - x
     setW(window.innerWidth - offsetEdge / 2)
   }, [cRef, carousel])
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      ;(carousel as any).current.scrollLeft = 0
+    }
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   const handleLeftClick = (e: any) => {
     e.preventDefault()

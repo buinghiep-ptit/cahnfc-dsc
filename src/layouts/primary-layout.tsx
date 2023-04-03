@@ -1,8 +1,5 @@
-import { Swiper } from '@/components/BannerSwiper'
-import { CustomDropdown } from '@/components/commons/CustomDropdown'
-import { Footer, Header } from '@/components/layouts'
-import { HeaderNavbar } from '@/components/layouts/header-navbar'
-import { Typography } from '@mui/material'
+import { Footer } from '@/components/layouts'
+import { HeaderNavbar } from '@/components/layouts/header'
 import { Box } from '@mui/system'
 import * as React from 'react'
 

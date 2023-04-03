@@ -1,9 +1,11 @@
 /* eslint-disable import/no-named-as-default-member */
-import { FMSwiperSlider } from '@/components/FMSwiperSilder'
+import { FMSwiperSlider } from '@/components/commons/FMSwiperSilder'
 import { CAHNTV } from '@/components/home/CAHNTV'
 import { Matching } from '@/components/home/Matching'
 import { News } from '@/components/home/News'
 import { Products } from '@/components/home/Products'
+import { Sponsor } from '@/components/home/Sponsor'
+import { Team } from '@/components/home/Team'
 import { TrapezoidInfo } from '@/components/home/TrapezoidInfo'
 import { PrimaryLayout } from '@/layouts'
 import { IPost, NextPageWithLayout } from '@/models'
@@ -95,6 +97,13 @@ const Home: NextPageWithLayout = () => {
           <CAHNTV />
         </Container>
       </Box>
+
+      <section id="team">
+        <Team />
+      </section>
+      <section id="sponsor">
+        <Sponsor />
+      </section>
     </Box>
   )
 }

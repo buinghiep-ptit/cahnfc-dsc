@@ -7,7 +7,7 @@ import { Box } from '@mui/system'
 
 export interface ILoginPageProps {}
 
-export default function LoginPage(props: ILoginPageProps) {
+export default function SignIn(props: ILoginPageProps) {
   const router = useRouter()
   const { next } = router.query
   const { data: session, status } = useSession()

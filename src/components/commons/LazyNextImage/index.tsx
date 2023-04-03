@@ -7,12 +7,13 @@ const Wrapper = styled(Box)({
   position: 'relative',
   width: '100%',
   height: '100%',
+  cursor: 'pointer',
 })
 
-const Img = styled(Image)(({ loaded }: any) => ({
+const Img = styled(Image)(({ loaded, ishover }: any) => ({
+  transform: ishover ? 'scale(1.05)' : 'scale(1)',
   opacity: loaded ? 1 : 0,
-  transition: 'opacity 0.5s ease-in-out',
-  cursor: 'pointer',
+  transition: ishover ? 'transform 0.3s ease' : 'opacity 0.5s ease-in-out',
 }))
 
 const Overlay = styled(Box)({
@@ -21,7 +22,7 @@ const Overlay = styled(Box)({
   left: 0,
   width: '100%',
   height: '100%',
-  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  // backgroundColor: 'rgba(255, 255, 255, 0.7)',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -31,9 +32,16 @@ const Overlay = styled(Box)({
 export interface IProps {
   imgUrl: string
   canHover?: boolean
+  canOverlay?: boolean
+  defaultOverlay?: boolean
 }
 
-export const LazyNextImage = ({ imgUrl, canHover = true }: IProps) => {
+export const LazyNextImage = ({
+  imgUrl,
+  canHover = true,
+  canOverlay = true,
+  defaultOverlay = false,
+}: IProps) => {
   const [loading, setLoading] = useState(true)
   const [hover, setHover] = useState(false)
   const [showOverlay, setShowOverlay] = useState(false)
@@ -52,18 +60,13 @@ export const LazyNextImage = ({ imgUrl, canHover = true }: IProps) => {
     setShowOverlay(false)
   }
 
-  const style = {
-    transform: canHover && hover ? 'scale(1.05)' : 'scale(1)',
-    transition: 'transform 0.3s ease',
-  }
-
   return (
     <Wrapper
       onMouseEnter={handleOnMouseEnter}
       onMouseLeave={handleOnMouseLeave}
     >
       {loading && (
-        <Overlay>
+        <Overlay className="skeleton">
           <span>Đang tải...</span>
         </Overlay>
       )}
@@ -72,10 +75,11 @@ export const LazyNextImage = ({ imgUrl, canHover = true }: IProps) => {
         alt={'img lazy'}
         layout="fill"
         loaded={loading ? 0 : 1}
+        ishover={canHover && hover ? 1 : 0}
         onLoad={handleOnLoad}
-        style={style}
       />
-      {showOverlay && canHover && !loading && <div className="overlay"></div>}
+      {((canOverlay && showOverlay && canHover && !loading) ||
+        defaultOverlay) && <div className="overlay"></div>}
     </Wrapper>
   )
 }

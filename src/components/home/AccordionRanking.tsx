@@ -18,13 +18,16 @@ export function AccordionRanking() {
         name: 'Công an Hà Nội ' + (index + 1),
         roundNum: 12,
         point: 36,
+        isMyTeam: index === 7,
       })),
   )
 
-  console.log(Math.floor(Math.random() * 4) + 1)
   const extractItems = (items: IRank[]) => {
+    const idx = items.findIndex(item => item.isMyTeam)
+    console.log('idx:', idx)
     if (!expanded) {
-      return [...items.slice(0, 4)]
+      if (idx < 4) return [...items.slice(0, 4)]
+      else return [...items.slice(0, 3), ...items.slice(idx, idx + 1)]
     } else {
       return [...items]
     }
@@ -37,16 +40,25 @@ export function AccordionRanking() {
     return (
       <Stack
         direction={'row'}
-        justifyContent="space-between"
+        justifyContent="center"
         alignItems={'center'}
         width={'100%'}
-        py={2}
+        position="relative"
+        py={1.5}
       >
+        <Box
+          bgcolor={item.isMyTeam ? '#FFD200' : '#FFFFFF'}
+          position={'absolute'}
+          width="calc(100% - 64px)"
+          height={'100%'}
+          borderRadius="4px"
+        ></Box>
         <Grid
           container
           display={'flex'}
           justifyContent="space-between"
           alignItems={'center'}
+          zIndex={99}
         >
           <Grid item xs={2}>
             <Typography

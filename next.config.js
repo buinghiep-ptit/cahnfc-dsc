@@ -6,7 +6,11 @@ const nextConfig = {
     return [
       {
         source: '/login',
-        destination: '/auth/login', //
+        destination: '/auth/signIn', //
+      },
+      {
+        source: '/register',
+        destination: '/auth/register', //
       },
       {
         source: '/product/api/:path*',

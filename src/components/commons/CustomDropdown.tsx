@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { IRoute } from '../layouts/header-navbar'
+import { IRoute } from '../layouts/header'
 
 export interface Props {
   name?: string
