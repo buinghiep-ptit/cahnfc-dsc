@@ -46,11 +46,13 @@ export const OtpInput = (props: Props) => {
 
   // Create an array based on the size.
   const arr = new Array(size).fill('-')
+  const [isFocused, setIsFocused] = React.useState(false)
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
   ) => {
+    setIsFocused(true)
     const elem = e.target
     const val = e.target.value
     // check if the value is valid
@@ -98,6 +100,7 @@ export const OtpInput = (props: Props) => {
       {arr.map((_, index) => {
         return (
           <input
+            ref={input => index === 0 && !isFocused && input?.focus()}
             key={index}
             {...restProps}
             /**

@@ -60,8 +60,9 @@
     "react-slick": "^0.29.0",
     "react-swipeable": "^7.0.0",
     "react-waypoint": "^10.3.0",
-    "sass": "1.54.8",
+    "sass": "1.54.6",
     "slick-carousel": "^1.8.1",
+    "uuid": "^9.0.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
@@ -77,6 +78,7 @@
     "@types/react": "18.0.15",
     "@types/react-dom": "18.0.6",
     "@types/react-slick": "^0.23.10",
+    "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "autoprefixer": "^10.4.8",

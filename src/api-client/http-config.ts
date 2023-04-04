@@ -1,9 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { getSession } from 'next-auth/react'
 import queryString from 'query-string'
-// const camelize = require('camelize')
-
-const isServer = typeof window === 'undefined'
+import { v4 as uuidv4 } from 'uuid'
+const deviceId = uuidv4()
 
 enum StatusCode {
   Unauthorized = 401,
@@ -17,6 +16,7 @@ const headers: Readonly<Record<string, string | boolean>> = {
   'Content-Type': 'application/json; charset=utf-8',
   'Access-Control-Allow-Credentials': true,
   'X-Requested-With': 'XMLHttpRequest',
+  deviceId: '451796cc-9e5f-4424-8bf8-c1e6040b6d47' ?? deviceId,
 }
 
 let isRefreshing = false
@@ -43,7 +43,7 @@ class Http {
 
   initHttp() {
     const http = axios.create({
-      baseURL: isServer ? `${process.env.NEXT_PUBLIC_API_URL}` : '',
+      baseURL: process.env.NEXT_PUBLIC_API_URL,
       headers: headers,
       paramsSerializer: params => queryString.stringify(params),
       timeout: 15000,
@@ -53,22 +53,13 @@ class Http {
 
     http.interceptors.request.use(
       async (req: AxiosRequestConfig) => {
-        // const token = await AsyncStorage.getItem('token');
-        // if (token) {
-        //     config.headers.Authorization = `Bearer ${token}`;
-        // }
-        // return config;
         const originalRequest = req
-
         const session = await getSession()
-
         if (session && (session as any).accessToken) {
           ;(req.headers as any).Authorization = `Bearer ${
             (session as any).accessToken
           }`
         }
-        // const language = await AsyncStorage.getItem('currentLanguage')
-        // req.headers.lang = language ?? 'vi'
 
         if (currentExecutingRequests[req.url as keyof object]) {
           const source = currentExecutingRequests[req.url ?? '']
@@ -92,7 +83,10 @@ class Http {
           // here you clean the request
           delete currentExecutingRequests[response.request.responseURL]
         }
-
+        const responseData = response.data
+        if (responseData.code && parseInt(responseData.code) !== 200) {
+          return Promise.reject(response)
+        }
         return response
       },
       async err => {

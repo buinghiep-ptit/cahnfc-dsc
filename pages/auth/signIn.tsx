@@ -17,6 +17,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { MuiButton } from '@/components/commons/MuiButton'
+import { PopupNotification } from '@/components/commons/PopupNotification'
+import { MuiTypography } from '@/components/commons/MuiTypography'
+import AppLoading from '@/components/commons/AppLoading'
 
 export interface IProps {}
 
@@ -29,6 +33,13 @@ export default function SignIn(props: IProps) {
   const router = useRouter()
   const { next } = router.query
   const { data: session, status } = useSession()
+  const [isLogging, setIsLogging] = React.useState(false)
+  const [errors, setErrors] = React.useState<{ errorMsg?: string }>()
+  const [open, setOpen] = React.useState(false)
+
+  React.useEffect(() => {
+    if (session) router.push('/')
+  })
 
   const [showPassword, setShowPassword] = React.useState<{
     visibility: boolean
@@ -62,6 +73,7 @@ export default function SignIn(props: IProps) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     console.log(values)
+    handleLoginPhone()
   }
 
   const handleClickShowPassword = () => {
@@ -71,241 +83,313 @@ export default function SignIn(props: IProps) {
     }))
   }
 
-  const handleLogin = async () => {
-    const res = await signIn('credentials', {
-      email: 'giangcm@fpt.com.vn',
-      password: 'abc123456',
+  const handleLoginPhone = async () => {
+    setIsLogging(true)
+    await signIn('credentials', {
+      phoneNumber: '0975452751',
+      password: 'Buivannghiep92',
       callbackUrl: next ? (next as string) : '',
+      redirect: false,
+    }).then(({ ok, error }: any) => {
+      setIsLogging(false)
+
+      if (!ok) {
+        setErrors(prev => ({
+          ...prev,
+          errorMsg: JSON.parse(error).errorMsg,
+        }))
+        setOpen(true)
+      } else {
+        setErrors(undefined)
+      }
     })
-    console.log('res:', res)
   }
-  console.log('status:', status)
 
   const handleLoginFacebook = async () => {
-    const res = await signIn('facebook', {
+    setIsLogging(true)
+
+    const result = await signIn('facebook', {
       callbackUrl: next ? (next as string) : '',
+      redirect: false,
     })
-    console.log('facebook:', res)
+
+    if (result?.error) {
+      setErrors(prev => ({
+        ...prev,
+        errorMsg: 'Đăng nhập không thành công, vui lòng thử lại!',
+      }))
+      setOpen(true)
+    } else {
+      setErrors(undefined)
+    }
+    setIsLogging(false)
   }
 
   const handleLoginGoogle = async () => {
-    const res = await signIn('google', {
+    setIsLogging(true)
+
+    const result = await signIn('google', {
       callbackUrl: next ? (next as string) : '',
-      // uselessWindow: true,
+      redirect: false,
     })
-    console.log('google:', res)
+    if (result?.error) {
+      setErrors(prev => ({
+        ...prev,
+        errorMsg: 'Đăng nhập không thành công, vui lòng thử lại!',
+      }))
+      setOpen(true)
+    } else {
+      setErrors(undefined)
+    }
+    setIsLogging(false)
   }
 
-  const handleLoginApple = async () => {
-    const res = await signIn('apple')
-    console.log('apple:', res)
+  const handleClose = () => {
+    setOpen(false)
   }
 
   return (
-    <JustifyBox
-      minHeight={'100vh'}
-      sx={{
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundImage: 'url(/assets/images/signIn/bg-signIn.jpg)',
-      }}
-    >
-      <Container
+    <>
+      {isLogging && <AppLoading />}
+      <JustifyBox
+        minHeight={'100vh'}
         sx={{
-          position: 'relative',
-          display: 'flex',
-          justifyContent: 'center',
-          flexDirection: 'row',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundImage: 'url(/assets/images/signIn/bg-signIn.jpg)',
         }}
       >
-        <IconButton sx={{ position: 'absolute', top: 0, left: 20 }}>
-          <Image
-            src="/assets/images/vuesax/arrow-left-circle.svg"
-            width={40}
-            height={40}
-            alt=""
-          />
-        </IconButton>
-        <Box
-          bgcolor={'#FFFFFF'}
-          borderRadius={3}
-          width={{ xs: '100%', md: '70%' }}
-          px={{ xs: 2, md: 12 }}
-          gap={2}
-          py={4.5}
+        <Container
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'row',
+          }}
         >
-          <Stack alignItems={'center'} pb={2} gap={2}>
+          <IconButton sx={{ position: 'absolute', top: 0, left: 20 }}>
             <Image
-              src="/assets/images/logo-border.svg"
-              width={108}
-              height={108}
+              src="/assets/images/vuesax/arrow-left-circle.svg"
+              width={40}
+              height={40}
               alt=""
             />
-            <Typography variant="h3" color={'secondary'} letterSpacing={'1px'}>
-              Đăng nhập
-            </Typography>
-          </Stack>
-
-          <form
-            onSubmit={methods.handleSubmit(onSubmitHandler)}
-            noValidate
-            autoComplete="off"
+          </IconButton>
+          <Box
+            bgcolor={'#FFFFFF'}
+            borderRadius={3}
+            width={{ xs: '100%', md: '70%' }}
+            px={{ xs: 2, md: 12 }}
+            gap={2}
+            py={3.5}
           >
-            <FormProvider {...methods}>
-              <Stack gap={2.5}>
-                <Stack gap={1.5}>
-                  <Typography variant="body1" color={'secondary'}>
-                    Số điện thoại
-                  </Typography>
-                  <MuiRHFInputText
-                    label={'Số điện thoại'}
-                    required
-                    type="text"
-                    name="mobilePhone"
-                    defaultValue=""
-                    placeholder="Nhập số điện thoại"
-                    autoFocus={true}
-                  />
-                </Stack>
-
-                <Stack gap={1.5}>
-                  <Typography variant="body1" color={'secondary'}>
-                    Mật khẩu
-                  </Typography>
-                  <MuiRHFInputText
-                    label={'Mật khẩu'}
-                    type={showPassword.visibility ? 'text' : 'password'}
-                    name="password"
-                    defaultValue=""
-                    placeholder="Nhập mật khẩu"
-                    iconEnd={
-                      <IconButton onClick={handleClickShowPassword} edge="end">
-                        {!showPassword.visibility ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    }
-                    fullWidth
-                    required
-                  />
-                </Stack>
-                <Link href={'/forgot-password'} passHref>
-                  <a>
-                    <Typography
-                      variant="body1"
-                      fontWeight={500}
-                      color={'secondary'}
-                      textAlign="end"
-                    >
-                      Quên mật khẩu?
-                    </Typography>
-                  </a>
-                </Link>
-
-                <Button
-                  onClick={() => {}}
-                  variant="contained"
-                  sx={{
-                    color: '#FFD200',
-                    width: '100%',
-                    height: 48,
-                    mt: 1,
-                  }}
-                >
-                  Đăng nhập
-                </Button>
-              </Stack>
-            </FormProvider>
-          </form>
-          <Stack my={4} gap={2}>
-            <Typography variant="body1" color={'secondary'} textAlign="center">
-              Hoặc đăng nhập bằng
-            </Typography>
-            <Stack direction={'row'} gap={3} justifyContent="center">
-              <Button
-                onClick={() => {}}
-                variant="contained"
-                sx={{
-                  height: 48,
-                  background: '#E7F5FF',
-                  boxShadow: 'none',
-                  width: 175,
-                }}
+            <Stack alignItems={'center'} pb={2} gap={1.5}>
+              <Image
+                src="/assets/images/logo-border.svg"
+                width={108}
+                height={108}
+                alt=""
+              />
+              <Typography
+                variant="h3"
+                color={'secondary'}
+                letterSpacing={'1px'}
               >
-                <Stack
-                  direction={'row'}
-                  alignItems={'center'}
-                  justifyContent="center"
-                  gap={2}
-                  px={1}
-                >
-                  <Image
-                    src="/assets/images/social/fb-square.svg"
-                    width={24}
-                    height={24}
-                    alt=""
-                  />
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={500}
-                    color={'secondary'}
-                  >
-                    Facebook
-                  </Typography>
-                </Stack>
-              </Button>
-              <Button
-                onClick={handleLoginGoogle}
-                variant="contained"
-                sx={{
-                  height: 48,
-                  background: '#FFF5F5',
-                  boxShadow: 'none',
-                  width: 175,
-                }}
-              >
-                <Stack
-                  direction={'row'}
-                  alignItems={'center'}
-                  justifyContent="center"
-                  gap={2}
-                  px={1}
-                >
-                  <Image
-                    src="/assets/images/social/gg-square.svg"
-                    width={24}
-                    height={24}
-                    alt=""
-                  />
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={500}
-                    color={'secondary'}
-                  >
-                    Google
-                  </Typography>
-                </Stack>
-              </Button>
+                Đăng nhập
+              </Typography>
             </Stack>
-          </Stack>
-          <Link href={'/register'} passHref>
-            <a>
+
+            <form
+              onSubmit={methods.handleSubmit(onSubmitHandler)}
+              noValidate
+              autoComplete="off"
+            >
+              <FormProvider {...methods}>
+                <Stack gap={2}>
+                  <Stack gap={1}>
+                    <Typography variant="body1" color={'secondary'}>
+                      Số điện thoại
+                    </Typography>
+                    <MuiRHFInputText
+                      label={'Số điện thoại'}
+                      required
+                      type="text"
+                      name="mobilePhone"
+                      defaultValue=""
+                      placeholder="Nhập số điện thoại"
+                      autoFocus={true}
+                    />
+                  </Stack>
+
+                  <Stack gap={1}>
+                    <Typography variant="body1" color={'secondary'}>
+                      Mật khẩu
+                    </Typography>
+                    <MuiRHFInputText
+                      label={'Mật khẩu'}
+                      type={showPassword.visibility ? 'text' : 'password'}
+                      name="password"
+                      defaultValue=""
+                      placeholder="Nhập mật khẩu"
+                      iconEnd={
+                        <IconButton
+                          onClick={handleClickShowPassword}
+                          edge="end"
+                        >
+                          {!showPassword.visibility ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      }
+                      fullWidth
+                      required
+                    />
+                  </Stack>
+                  <Link href={'/forgot-password'} passHref>
+                    <a>
+                      <Typography
+                        variant="body1"
+                        fontWeight={500}
+                        color={'secondary'}
+                        textAlign="end"
+                      >
+                        Quên mật khẩu?
+                      </Typography>
+                    </a>
+                  </Link>
+
+                  <MuiButton
+                    onClick={handleLoginPhone}
+                    variant="contained"
+                    loading={isLogging}
+                    sx={{
+                      color: '#FFD200',
+                      width: '100%',
+                      height: 48,
+                      mt: 1,
+                    }}
+                    title="Đăng nhập"
+                  />
+                </Stack>
+              </FormProvider>
+            </form>
+            <Stack my={3.5} gap={1.5}>
               <Typography
                 variant="body1"
                 color={'secondary'}
                 textAlign="center"
               >
-                Bạn chưa có tài khoản?{' '}
-                <span style={{ color: '#ED1E24', fontWeight: 600 }}>
-                  Đăng ký ngay
-                </span>
+                Hoặc đăng nhập bằng
               </Typography>
-            </a>
-          </Link>
-        </Box>
-      </Container>
-    </JustifyBox>
+              <Stack direction={'row'} gap={3} justifyContent="center">
+                <Button
+                  onClick={handleLoginFacebook}
+                  variant="contained"
+                  sx={{
+                    height: 48,
+                    background: '#E7F5FF',
+                    boxShadow: 'none',
+                    width: 175,
+                  }}
+                >
+                  <Stack
+                    direction={'row'}
+                    alignItems={'center'}
+                    justifyContent="center"
+                    gap={2}
+                    px={1}
+                  >
+                    <Image
+                      src="/assets/images/social/fb-square.svg"
+                      width={24}
+                      height={24}
+                      alt=""
+                    />
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={500}
+                      color={'secondary'}
+                    >
+                      Facebook
+                    </Typography>
+                  </Stack>
+                </Button>
+                <Button
+                  onClick={handleLoginGoogle}
+                  variant="contained"
+                  sx={{
+                    height: 48,
+                    background: '#FFF5F5',
+                    boxShadow: 'none',
+                    width: 175,
+                  }}
+                >
+                  <Stack
+                    direction={'row'}
+                    alignItems={'center'}
+                    justifyContent="center"
+                    gap={2}
+                    px={1}
+                  >
+                    <Image
+                      src="/assets/images/social/gg-square.svg"
+                      width={24}
+                      height={24}
+                      alt=""
+                    />
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={500}
+                      color={'secondary'}
+                    >
+                      Google
+                    </Typography>
+                  </Stack>
+                </Button>
+              </Stack>
+            </Stack>
+            <Link href={'/register'} passHref>
+              <a>
+                <Typography
+                  variant="body1"
+                  color={'secondary'}
+                  textAlign="center"
+                >
+                  Bạn chưa có tài khoản?{' '}
+                  <span style={{ color: '#ED1E24', fontWeight: 600 }}>
+                    Đăng ký ngay
+                  </span>
+                </Typography>
+              </a>
+            </Link>
+          </Box>
+        </Container>
+      </JustifyBox>
+
+      <PopupNotification
+        title={''}
+        open={open}
+        onCloseModal={handleClose}
+        cancelText="Đóng"
+      >
+        <JustifyBox flexDirection={'column'} gap={4}>
+          <Image
+            src={'/assets/images/common/error.svg'}
+            width={124}
+            height={124}
+            alt=""
+          />
+          <MuiTypography
+            variant="subtitle2"
+            fontSize={'1.125rem'}
+            color={'secondary'}
+          >
+            {errors?.errorMsg}
+          </MuiTypography>
+        </JustifyBox>
+      </PopupNotification>
+    </>
   )
 }

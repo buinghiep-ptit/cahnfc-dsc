@@ -1,21 +1,3 @@
-// import { Typography } from '@mui/material'
-// import { Box } from '@mui/system'
-// import { signOut, useSession } from 'next-auth/react'
-// import * as React from 'react'
-
-// export function Header() {
-//   const { data: session } = useSession()
-//   const handleSignOut = async () => {
-//     await signOut({ callbackUrl: window.location.href })
-//   }
-//   return (
-//     <Box>
-//       <Typography variant="h1">Navbar Header Component</Typography>
-//       {session ? <button onClick={handleSignOut}>SignOut</button> : null}
-//     </Box>
-//   )
-// }
-
 import MenuIcon from '@mui/icons-material/Menu'
 import { Container, Stack, styled } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
@@ -33,6 +15,7 @@ import { useEffect, useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { CustomDropdown } from '../commons/CustomDropdown'
+import { logOut } from '@/api-client'
 
 interface Props {
   brand?: string
@@ -97,7 +80,10 @@ export function HeaderNavbar(props: Props) {
   const { data: session } = useSession()
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: window.location.href })
+    try {
+      // await logOut()
+      await signOut({ callbackUrl: window.location.href })
+    } catch (error) {}
   }
   const routesLeft: IRoute[] = [
     {
@@ -111,6 +97,16 @@ export function HeaderNavbar(props: Props) {
     {
       name: 'Đội hình',
       route: '/protected',
+      collapse: [
+        {
+          name: 'Đội hình A',
+          route: '/store/shirt',
+        },
+        {
+          name: 'Đội hình B',
+          route: '/store/collection',
+        },
+      ],
     },
     {
       name: 'Trận đấu',
@@ -172,23 +168,27 @@ export function HeaderNavbar(props: Props) {
           height={24}
         />
       ),
-      collapse: [
-        {
-          name: 'Đăng nhập',
-          route: '/login',
-        },
-        {
-          name: 'Đăng ký',
-          route: '/register',
-        },
-        {
-          name: 'Thông tin cá nhân',
-          route: '/profile',
-        },
-        {
-          name: 'Đăng xuất',
-        },
-      ],
+      collapse: session
+        ? [
+            {
+              name: 'Thông tin cá nhân',
+              route: '/profile',
+            },
+            {
+              name: 'Đăng xuất',
+              callBack: () => handleSignOut(),
+            },
+          ]
+        : [
+            {
+              name: 'Đăng nhập',
+              route: '/login',
+            },
+            {
+              name: 'Đăng ký',
+              route: '/register',
+            },
+          ],
     },
   ]
 
@@ -333,7 +333,7 @@ export function HeaderNavbar(props: Props) {
                 {renderRoutesRight}
               </Stack>
             )}
-            {session ? (
+            {/* {session ? (
               <CustomDropdown
                 name={'User'}
                 route={'/user-info'}
@@ -348,7 +348,7 @@ export function HeaderNavbar(props: Props) {
                   },
                 ]}
               />
-            ) : null}
+            ) : null} */}
           </Toolbar>
         </Container>
       </StyledAppBar>

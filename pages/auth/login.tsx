@@ -1,9 +1,7 @@
-import React from 'react'
+import { Box } from '@mui/system'
 import { signIn, useSession } from 'next-auth/react'
-import Seo from '@/components/commons/seo'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Box } from '@mui/system'
 
 export interface ILoginPageProps {}
 
@@ -14,8 +12,8 @@ export default function SignIn(props: ILoginPageProps) {
 
   const handleLogin = async () => {
     const res = await signIn('credentials', {
-      email: 'giangcm@fpt.com.vn',
-      password: 'abc123456',
+      phoneNumber: '0975452750',
+      password: 'Buivannghiep91',
       callbackUrl: next ? (next as string) : '',
     })
     console.log('res:', res)
@@ -42,6 +40,15 @@ export default function SignIn(props: ILoginPageProps) {
     console.log('apple:', res)
   }
 
+  const handleSignUp = () => {
+    // const res = await sign('credentials', {
+    //   email: 'giangcm@fpt.com.vn',
+    //   password: 'abc123456',
+    //   callbackUrl: next ? (next as string) : '',
+    // })
+    // console.log('res:', res)
+  }
+
   return (
     <div>
       <Head>
@@ -63,6 +70,7 @@ export default function SignIn(props: ILoginPageProps) {
         )}
       </div> */}
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <button onClick={handleSignUp}>Register</button>
         <button onClick={handleLogin}>Login</button>
         <button onClick={handleLoginFacebook}>Login Facebook</button>
         <button onClick={handleLoginGoogle}>Login Google</button>

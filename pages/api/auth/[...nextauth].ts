@@ -1,21 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { loginUser, renewToken } from '@/api-client'
+import { login, loginSocial, renewToken } from '@/api-client'
+import { getMessageString } from '@/helpers/messageToString'
 import { NextApiRequest, NextApiResponse } from 'next'
-import NextAuth, {
-  NextAuthOptions,
-  Session,
-  SessionStrategy,
-  User,
-} from 'next-auth'
+import NextAuth, { NextAuthOptions, SessionStrategy } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 import AppleProvider from 'next-auth/providers/apple'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import FacebookProvider from 'next-auth/providers/facebook'
 import GoogleProvider from 'next-auth/providers/google'
 
-const refreshAccessToken = async (
-  payload: { refreshToken: string; deviceId: string } & Record<string, string>,
-): Promise<JWT> => {
+const refreshAccessToken = async (payload: {
+  refreshToken: string
+}): Promise<JWT> => {
   try {
     // Get a new set of tokens with a refreshToken
     const tokenResponse = await renewToken(payload)
@@ -23,8 +19,8 @@ const refreshAccessToken = async (
     return {
       ...payload,
       accessToken: tokenResponse.accessToken,
-      expiredIn: tokenResponse.expiredIn,
-      refreshToken: tokenResponse.refreshToken,
+      expiredAt:
+        (tokenResponse.expiresIn ?? 0) + (tokenResponse.created ?? 0) * 1000,
     }
   } catch (error) {
     return {
@@ -75,57 +71,66 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
       CredentialsProvider({
         type: 'credentials',
         credentials: {
-          email: { label: 'Email', type: 'text' },
+          phoneNumber: { label: 'PhoneNumber', type: 'text' },
           password: { label: 'Password', type: 'password' },
+          deviceId: { label: 'DeviceId', type: 'text' },
         },
         authorize: async (credentials, _req) => {
           const payload = {
-            email: credentials!.email,
+            phoneNumber: credentials!.phoneNumber,
             password: credentials!.password,
+            returnRefreshToken: true,
           }
           try {
-            const user = await loginUser({ ...payload, rememberMe: false })
-            if ((user as any).accessToken) {
+            const user = await login(payload)
+            if (user && (user as any).accessToken) {
               return user
             }
 
             return null
           } catch (error) {
-            throw new Error(`${error}`)
+            const msgStr = getMessageString(error as any)
+            throw new Error(`${JSON.stringify({ errorMsg: msgStr })}`)
           }
-          // const cookies = response.headers["set-cookie"];
-          // res.setHeader("Set-Cookie", cookies);
         },
       }),
     ],
     // refetchInterval: 1 * 24 * 60 * 60,
     secret: process.env.SECRET,
     debug: true,
-    session: {
-      strategy: 'jwt' as SessionStrategy,
-      maxAge: 1 * 60,
-    },
-    jwt: {
-      maxAge: 1 * 60,
-    },
     pages: {
       signIn: '/auth/signin',
       signOut: '/auth/signout',
       error: '/auth/error', // Error code passed in query string as ?error=
     },
     callbacks: {
-      signIn: async ({
-        user,
-        account,
-        profile,
-        credentials,
-      }: Record<string, unknown>) => {
-        if (account) {
-          // token.accessToken = account.access_token
-          // console.log('account signIn:', account)
+      signIn: async ({ user, account }: { user: any; account: any }) => {
+        if (account.provider !== 'credentials') {
+          try {
+            const data = await loginSocial({
+              platform: account.provider.toUpperCase(),
+              token: account.access_token,
+              returnRefreshToken: true,
+            })
+            if (data && data.accessToken) {
+              user.accessToken = data.accessToken
+              user.refreshToken = data.refreshToken
+              user.expiresIn = data.expiresIn
+              user.created = data.created
+            }
+          } catch (error) {
+            throw new Error(`${error}`)
+          }
         }
 
         return true
+      },
+      onError: async (error: any) => {
+        // You can customize the error message as per your needs
+        return Promise.resolve({
+          error: 'Login Failed',
+          message: error.message,
+        })
       },
       async redirect({ url, baseUrl }: any) {
         // Allows relative callback URLs
@@ -134,49 +139,39 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         else if (new URL(url).origin === baseUrl) return url
         return baseUrl
       },
-      register: async ({
-        firstName,
-        lastName,
-        email,
-        password,
-      }: Record<string, string>) => {},
+      register: async ({ phoneNumber, otp }: Record<string, string>) => {
+        console.log(phoneNumber, otp)
+      },
       jwt: async ({
         token,
         user,
-        account,
       }: {
-        token: JWT
-        user?: User
+        token: any
+        user?: any
         account?: any
       }) => {
         if (user) {
-          // token.expiredAt = user.expiredAt
-          // token.refreshToken = user.refreshToken || null
-          token = { ...token, ...user }
-        }
-
-        if (account) {
-          token = { ...token, ...account }
-          //get token our services replace for social auth service here
+          token.accessToken = user.accessToken
+          token.refreshToken = user.refreshToken
+          token.expiredAt = (user.created ?? 0) * 1000 + (user.expiresIn ?? 0)
         }
 
         const shouldRefreshTime = Math.round(
-          ((token as any)?.expiredAt as number) - 30 * 60 * 1000 - Date.now(), // 30 minutes
+          token.expiredAt - 5 * 60 * 1000 - Date.now(), // get before 5 minutes
         )
+
         if (shouldRefreshTime > 0) return token
 
-        if ((token as any)?.refreshToken) {
-          token = (await refreshAccessToken({
-            refreshToken: (token as any).refreshToken as string,
-            deviceId: 'XXX-XX-XXX',
-          })) as JWT & Record<string, string>
-        }
+        token = await refreshAccessToken({
+          refreshToken: token.refreshToken,
+        })
 
         return token
       },
-      session: async ({ session, token }: { session: Session; token: JWT }) => {
-        session = { ...session, ...token } as Session
-
+      session: async ({ session, token }: { session: any; token: any }) => {
+        session.accessToken = token.accessToken
+        session.refreshToken = token.refreshToken
+        session.expiredAt = token.expiredAt
         return session
       },
     },

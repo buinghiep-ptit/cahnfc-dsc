@@ -57,12 +57,14 @@ export function Footer(props: IFooterProps) {
               <Stack direction={'row'} alignItems="center" gap={2} mt={2}>
                 {socialLogos.map((item, index) => (
                   <Link key={index} href={item.href} passHref>
-                    <Image
-                      src={item.iconUrl}
-                      width={36}
-                      height={36}
-                      alt="social"
-                    />
+                    <a>
+                      <Image
+                        src={item.iconUrl}
+                        width={36}
+                        height={36}
+                        alt="social"
+                      />
+                    </a>
                   </Link>
                 ))}
               </Stack>

@@ -39,7 +39,9 @@ export function HighLightCard({ item }: IProps) {
           }}
         >
           <Link href={'/'} passHref>
-            <LazyNextImage imgUrl={item.thumb ?? ''} />
+            <a>
+              <LazyNextImage imgUrl={item.thumb ?? ''} />
+            </a>
           </Link>
         </Box>
 

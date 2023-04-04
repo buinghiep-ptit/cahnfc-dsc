@@ -1,8 +1,14 @@
 /* eslint-disable import/no-unresolved */
+import { registerOTP, setPassword, validateOTP } from '@/api-client'
+import AppLoading from '@/components/commons/AppLoading'
+import { MuiButton } from '@/components/commons/MuiButton'
 import { MuiRHFCheckBox } from '@/components/commons/MuiRHFCheckBox'
 import { MuiRHFInputText } from '@/components/commons/MuiRHFTextInput'
+import { MuiTypography } from '@/components/commons/MuiTypography'
 import { OtpInput } from '@/components/commons/otp-input'
+import { PopupNotification } from '@/components/commons/PopupNotification'
 import { JustifyBox } from '@/components/home/CAHNTV'
+import { getMessageString } from '@/helpers/messageToString'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
@@ -13,7 +19,10 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
+import _ from 'lodash'
+import { signIn } from 'next-auth/react'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 import * as React from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -21,24 +30,44 @@ import * as Yup from 'yup'
 export interface IProps {}
 
 type SchemaType = {
-  mobilePhone?: string
+  phoneNumber?: string
   password?: string
   passwordConfirmation?: string
+  isAgree?: boolean
 }
 
 export default function SignUp(props: IProps) {
+  const router = useRouter()
+  const { next } = router.query
   const [otp, setOtp] = React.useState('')
   const [step, setStep] = React.useState(1)
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [errors, setErrors] = React.useState<{ errorMsg?: string }>()
   const [showPassword, setShowPassword] = React.useState<{
     visibility: boolean
   }>({
     visibility: false,
   })
+  const [open, setOpen] = React.useState(false)
+
+  const inputRef = React.useRef<any>(null)
+
+  React.useEffect(() => {
+    if (!inputRef.current || !inputRef) return
+    const timeout = setTimeout(() => {
+      inputRef.current.focus()
+    }, 100)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [])
+
   const phoneRegExp =
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
   const validationSchema = Yup.object().shape({
-    mobilePhone: Yup.string()
+    phoneNumber: Yup.string()
       .matches(phoneRegExp, {
         message: 'Số điện thoại không hợp lệ',
         excludeEmptyString: true,
@@ -50,26 +79,73 @@ export default function SignUp(props: IProps) {
         return val.length == 0 || val.length === 10
       })
       .required('messages.MSG1'),
-    password: Yup.string()
-      .required('messages.MSG1')
-      .test('latinChars', 'messages.MSG21', value => {
-        const regexStr = /^[\x20-\x7E]+$/
-        if (value) {
-          return regexStr.test(value)
-        } else return false
-      })
-      .matches(/^\S*$/, 'messages.MSG21')
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, 'messages.MSG20'),
-    passwordConfirmation: Yup.string()
-      .oneOf([Yup.ref('newPassword'), null], 'messages.MSG11')
-      .required('messages.MSG1'),
+    password:
+      step === 3
+        ? Yup.string()
+            .required('messages.MSG1')
+            .test('latinChars', 'messages.MSG21', value => {
+              const regexStr = /^[\x20-\x7E]+$/
+              if (value) {
+                return regexStr.test(value)
+              } else return false
+            })
+            .matches(/^\S*$/, 'messages.MSG21')
+            .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, 'messages.MSG20')
+        : Yup.string().notRequired(),
+    passwordConfirmation:
+      step === 3
+        ? Yup.string()
+            .oneOf([Yup.ref('newPassword'), null], 'messages.MSG11')
+            .required('messages.MSG1')
+        : Yup.string().notRequired(),
   })
 
   const methods = useForm({
-    defaultValues: {},
+    defaultValues: { isAgree: false, phoneNumber: '' },
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const isAgree = methods.watch('isAgree')
+  const phoneNumber = methods.watch('phoneNumber')
+
+  const handleLoginFacebook = async () => {
+    setIsLoading(true)
+
+    const result = await signIn('facebook', {
+      callbackUrl: next ? (next as string) : '',
+      redirect: false,
+    })
+
+    if (result?.error) {
+      setErrors(prev => ({
+        ...prev,
+        errorMsg: 'Đăng nhập không thành công, vui lòng thử lại!',
+      }))
+      setOpen(true)
+    } else {
+      setErrors(undefined)
+    }
+    setIsLoading(false)
+  }
+
+  const handleLoginGoogle = async () => {
+    setIsLoading(true)
+    const result = await signIn('google', {
+      callbackUrl: next ? (next as string) : '',
+      redirect: false,
+    })
+    if (result?.error) {
+      setErrors(prev => ({
+        ...prev,
+        errorMsg: 'Đăng nhập không thành công, vui lòng thử lại!',
+      }))
+      setOpen(true)
+    } else {
+      setErrors(undefined)
+    }
+    setIsLoading(false)
+  }
 
   const handleClickShowPassword = () => {
     setShowPassword(prev => ({
@@ -78,9 +154,53 @@ export default function SignUp(props: IProps) {
     }))
   }
 
-  const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+  const onSubmitHandler: SubmitHandler<SchemaType> = async (
+    values: SchemaType,
+  ) => {
     console.log(values)
-    setStep(step + 1)
+    try {
+      if (step === 1) {
+        const result = await registerOTP({ phoneNumber: values.phoneNumber })
+      } else if (step === 2) {
+        const result = await validateOTP({
+          phoneNumber: values.phoneNumber,
+          otp: otp,
+        })
+      } else {
+        const result = await setPassword({
+          password: values.password,
+          deviceId: '451796cc-9e5f-4424-8bf8-c1e6040b6d47',
+          returnRefreshToken: true,
+        })
+
+        router.push('/')
+      }
+      setStep(step + 1)
+    } catch (error) {
+      console.log(error)
+      const msgStr = getMessageString(error as any)
+      setErrors(prev => ({
+        ...prev,
+        errorMsg: msgStr,
+      }))
+      setOpen(true)
+    }
+  }
+
+  const handleGoBack = () => {
+    if (step === 1) {
+      router.push('/')
+      return
+    }
+    setStep(step - 1)
+  }
+
+  const handleClickOpen = () => {
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
   }
 
   const getStepLabel = (step: number) => {
@@ -98,323 +218,372 @@ export default function SignUp(props: IProps) {
   }
 
   return (
-    <JustifyBox
-      minHeight={'100vh'}
-      sx={{
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundImage: 'url(/assets/images/signIn/bg-signIn.jpg)',
-      }}
-    >
-      <Container
+    <>
+      {isLoading && <AppLoading />}
+
+      <JustifyBox
+        minHeight={'100vh'}
         sx={{
-          position: 'relative',
-          display: 'flex',
-          justifyContent: 'center',
-          flexDirection: 'row',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundImage: 'url(/assets/images/signIn/bg-signIn.jpg)',
         }}
       >
-        <IconButton sx={{ position: 'absolute', top: 0, left: 20 }}>
-          <Image
-            src="/assets/images/vuesax/arrow-left-circle.svg"
-            width={40}
-            height={40}
-            alt=""
-          />
-        </IconButton>
-        <Box
-          bgcolor={'#FFFFFF'}
-          borderRadius={3}
-          width={{ xs: '100%', md: '70%' }}
-          px={{ xs: 2, md: 12 }}
-          gap={2}
-          py={4.5}
+        <Container
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'row',
+          }}
         >
-          <Stack alignItems={'center'} pb={3} gap={2}>
+          <IconButton
+            onClick={handleGoBack}
+            sx={{ position: 'absolute', top: 0, left: 20 }}
+          >
             <Image
-              src="/assets/images/logo-border.svg"
-              width={108}
-              height={108}
+              src="/assets/images/vuesax/arrow-left-circle.svg"
+              width={40}
+              height={40}
               alt=""
             />
-            <Typography variant="h3" color={'secondary'}>
-              {getStepLabel(step ?? 0)}
-            </Typography>
-          </Stack>
-
-          <form
-            onSubmit={methods.handleSubmit(onSubmitHandler)}
-            noValidate
-            autoComplete="off"
+          </IconButton>
+          <Box
+            bgcolor={'#FFFFFF'}
+            borderRadius={3}
+            width={{ xs: '100%', md: '70%' }}
+            px={{ xs: 2, md: 12 }}
+            gap={2}
+            py={4.5}
+            display={'flex'}
+            flexDirection="column"
+            justifyContent="center"
           >
-            <FormProvider {...methods}>
-              <Stack gap={2.5}>
-                {step === 1 && (
-                  <>
-                    <Stack gap={1.5}>
-                      <Typography variant="body1" color={'secondary'}>
-                        Sử dụng số điện thoại để đăng ký tài khoản
-                      </Typography>
-                      <MuiRHFInputText
-                        label={'Số điện thoại'}
-                        required
-                        type="text"
-                        name="mobilePhone"
-                        defaultValue=""
-                        placeholder="Nhập số điện thoại"
-                        autoFocus={true}
-                      />
-                    </Stack>
-                    <Stack direction={'row'} gap={2} alignItems="flex-start">
-                      <MuiRHFCheckBox
-                        name="isAgree"
-                        label={
-                          <Typography variant="body1" color={'secondary'}>
-                            Bằng việc đăng ký, bạn đã đồng ý với CAHN FC về{' '}
-                            <span style={{ fontWeight: 500 }}>
-                              Điều khoản sử dụng{' '}
-                            </span>{' '}
-                            và{' '}
-                            <span style={{ fontWeight: 500 }}>
-                              Chính sách bảo mật!
-                            </span>
-                          </Typography>
-                        }
-                      />
-                    </Stack>
-                  </>
-                )}
-                {step === 2 && (
-                  <JustifyBox flexDirection={'column'} gap={6}>
-                    <Typography variant="body1" color={'secondary'}>
-                      Nhập mã xác thực gồm 6 ký tự được gửi đến số điện thoại{' '}
-                      <span style={{ fontWeight: 500 }}> 094******4</span>
-                    </Typography>
-                    <OtpInput
-                      value={otp}
-                      onChange={val => {
-                        setOtp(val)
-                      }}
-                    />
-                    <Typography variant="body1" color={'secondary'}>
-                      Chưa nhận được mã OTP?{' '}
-                      <span style={{ fontWeight: 500 }}>Gửi lại sau: 30s</span>
-                    </Typography>
-                  </JustifyBox>
-                )}
-
-                {step === 3 && (
-                  <>
-                    <Stack gap={1.5}>
-                      <Typography variant="body1" color={'secondary'}>
-                        Nhập mật khẩu
-                      </Typography>
-                      <MuiRHFInputText
-                        label={'Mật khẩu'}
-                        type={showPassword.visibility ? 'text' : 'password'}
-                        name="password"
-                        defaultValue=""
-                        placeholder="Nhập mật khẩu"
-                        iconEnd={
-                          <IconButton
-                            onClick={handleClickShowPassword}
-                            edge="end"
-                          >
-                            {!showPassword.visibility ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
-                          </IconButton>
-                        }
-                        fullWidth
-                        required
-                      />
-                    </Stack>
-
-                    <Stack gap={1.5}>
-                      <Typography variant="body1" color={'secondary'}>
-                        Nhập lại mật khẩu
-                      </Typography>
-                      <MuiRHFInputText
-                        label={'Nhập lại mật khẩu'}
-                        type={showPassword.visibility ? 'text' : 'password'}
-                        name="passwordConfirmation"
-                        defaultValue=""
-                        placeholder="Nhập lại mật khẩu"
-                        iconEnd={
-                          <IconButton
-                            onClick={handleClickShowPassword}
-                            edge="end"
-                          >
-                            {!showPassword.visibility ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
-                          </IconButton>
-                        }
-                        fullWidth
-                        required
-                      />
-                    </Stack>
-                  </>
-                )}
-
-                <Button
-                  // type="submit"
-                  onClick={() => setStep(step + 1)}
-                  variant="contained"
-                  sx={{
-                    color: '#FFD200',
-                    width: '100%',
-                    height: 48,
-                    mt: 1.5,
-                  }}
-                >
-                  {step === 1 ? 'Đăng ký' : 'Tiếp tục'}
-                </Button>
-              </Stack>
-            </FormProvider>
-          </form>
-          {step === 1 && (
-            <Stack mt={4} gap={2}>
-              <Typography
-                variant="body1"
-                color={'secondary'}
-                textAlign="center"
-              >
-                Hoặc đăng nhập bằng
+            <Stack alignItems={'center'} pb={3} gap={2}>
+              <Image
+                src="/assets/images/logo-border.svg"
+                width={108}
+                height={108}
+                alt=""
+              />
+              <Typography variant="h3" color={'secondary'}>
+                {getStepLabel(step ?? 0)}
               </Typography>
-              <Stack direction={'row'} gap={3} justifyContent="center">
-                <Button
-                  onClick={() => {}}
-                  variant="contained"
-                  sx={{
-                    height: 48,
-                    background: '#E7F5FF',
-                    boxShadow: 'none',
-                    width: 175,
-                  }}
-                >
-                  <Stack
-                    direction={'row'}
-                    alignItems={'center'}
-                    justifyContent="center"
-                    gap={2}
-                    px={1}
-                  >
-                    <Image
-                      src="/assets/images/social/fb-square.svg"
-                      width={24}
-                      height={24}
-                      alt=""
-                    />
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight={500}
-                      color={'secondary'}
-                    >
-                      Facebook
-                    </Typography>
-                  </Stack>
-                </Button>
-                <Button
-                  onClick={() => {}}
-                  variant="contained"
-                  sx={{
-                    height: 48,
-                    background: '#FFF5F5',
-                    boxShadow: 'none',
-                    width: 175,
-                  }}
-                >
-                  <Stack
-                    direction={'row'}
-                    alignItems={'center'}
-                    justifyContent="center"
-                    gap={2}
-                    px={1}
-                  >
-                    <Image
-                      src="/assets/images/social/gg-square.svg"
-                      width={24}
-                      height={24}
-                      alt=""
-                    />
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight={500}
-                      color={'secondary'}
-                    >
-                      Google
-                    </Typography>
-                  </Stack>
-                </Button>
-              </Stack>
             </Stack>
-          )}
-          {step === 2 && (
-            <Typography
-              variant="body1"
-              sx={{ color: '#ED1E24', fontWeight: 600, mt: 4 }}
-              textAlign="center"
+
+            <form
+              onSubmit={methods.handleSubmit(onSubmitHandler)}
+              noValidate
+              autoComplete="off"
             >
-              Thay đổi số điện thoại
-            </Typography>
-          )}
-          {step === 3 && (
-            <Stack
-              bgcolor={'#FFF5F5'}
-              px={3}
-              py={1.5}
-              borderRadius={2}
-              gap={1}
-              mt={4}
-            >
-              <Typography
-                variant="subtitle1"
-                color={'secondary'}
-                sx={{ fontWeight: 500 }}
+              <FormProvider {...methods}>
+                <Stack gap={2.5}>
+                  {step === 1 && (
+                    <>
+                      <Stack gap={1.5}>
+                        <Typography variant="body1" color={'secondary'}>
+                          Sử dụng số điện thoại để đăng ký tài khoản
+                        </Typography>
+                        <MuiRHFInputText
+                          inputRef={inputRef}
+                          label={'Số điện thoại'}
+                          required
+                          type="text"
+                          name="phoneNumber"
+                          defaultValue=""
+                          placeholder="Nhập số điện thoại"
+                          autoFocus
+                        />
+                      </Stack>
+                      <Stack direction={'row'} gap={2} alignItems="flex-start">
+                        <MuiRHFCheckBox
+                          name="isAgree"
+                          label={
+                            <Typography variant="body1" color={'secondary'}>
+                              Bằng việc đăng ký, bạn đã đồng ý với CAHN FC về{' '}
+                              <span style={{ fontWeight: 500 }}>
+                                Điều khoản sử dụng{' '}
+                              </span>{' '}
+                              và{' '}
+                              <span style={{ fontWeight: 500 }}>
+                                Chính sách bảo mật!
+                              </span>
+                            </Typography>
+                          }
+                        />
+                      </Stack>
+                    </>
+                  )}
+                  {step === 2 && (
+                    <JustifyBox flexDirection={'column'} gap={6}>
+                      <Typography variant="body1" color={'secondary'}>
+                        Nhập mã xác thực gồm 6 ký tự được gửi đến số điện thoại{' '}
+                        <span style={{ fontWeight: 500 }}>
+                          {phoneNumber.slice(0, 3) +
+                            '******' +
+                            phoneNumber.slice(9)}
+                        </span>
+                      </Typography>
+                      <OtpInput
+                        value={otp}
+                        onChange={val => {
+                          setOtp(val)
+                        }}
+                      />
+                      <Typography variant="body1" color={'secondary'}>
+                        Chưa nhận được mã OTP?{' '}
+                        <span style={{ fontWeight: 500 }}>
+                          Gửi lại sau: 30s
+                        </span>
+                      </Typography>
+                    </JustifyBox>
+                  )}
+
+                  {step === 3 && (
+                    <>
+                      <Stack gap={1.5}>
+                        <Typography variant="body1" color={'secondary'}>
+                          Nhập mật khẩu
+                        </Typography>
+                        <MuiRHFInputText
+                          label={'Mật khẩu'}
+                          type={showPassword.visibility ? 'text' : 'password'}
+                          name="password"
+                          defaultValue=""
+                          placeholder="Nhập mật khẩu"
+                          iconEnd={
+                            <IconButton
+                              onClick={handleClickShowPassword}
+                              edge="end"
+                            >
+                              {!showPassword.visibility ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          }
+                          fullWidth
+                          required
+                        />
+                      </Stack>
+
+                      <Stack gap={1.5}>
+                        <Typography variant="body1" color={'secondary'}>
+                          Nhập lại mật khẩu
+                        </Typography>
+                        <MuiRHFInputText
+                          label={'Nhập lại mật khẩu'}
+                          type={showPassword.visibility ? 'text' : 'password'}
+                          name="passwordConfirmation"
+                          defaultValue=""
+                          placeholder="Nhập lại mật khẩu"
+                          iconEnd={
+                            <IconButton
+                              onClick={handleClickShowPassword}
+                              edge="end"
+                            >
+                              {!showPassword.visibility ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          }
+                          fullWidth
+                          required
+                        />
+                      </Stack>
+                    </>
+                  )}
+
+                  <MuiButton
+                    disabled={
+                      (step === 1 && (!isAgree || !phoneNumber)) ||
+                      (step === 2 && otp.length < 6) ||
+                      !_.isEmpty(methods.formState.errors)
+                    }
+                    loading={false}
+                    type="submit"
+                    sx={{
+                      color: '#FFD200',
+                      width: '100%',
+                      height: 48,
+                      mt: 1.5,
+                    }}
+                    title={step === 1 ? 'Đăng ký' : 'Tiếp tục'}
+                  />
+                </Stack>
+              </FormProvider>
+            </form>
+            {step === 1 && (
+              <Stack mt={4} gap={2}>
+                <Typography
+                  variant="body1"
+                  color={'secondary'}
+                  textAlign="center"
+                >
+                  Hoặc đăng nhập bằng
+                </Typography>
+                <Stack direction={'row'} gap={3} justifyContent="center">
+                  <Button
+                    onClick={handleLoginFacebook}
+                    variant="contained"
+                    sx={{
+                      height: 48,
+                      background: '#E7F5FF',
+                      boxShadow: 'none',
+                      width: 175,
+                    }}
+                  >
+                    <Stack
+                      direction={'row'}
+                      alignItems={'center'}
+                      justifyContent="center"
+                      gap={2}
+                      px={1}
+                    >
+                      <Image
+                        src="/assets/images/social/fb-square.svg"
+                        width={24}
+                        height={24}
+                        alt=""
+                      />
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight={500}
+                        color={'secondary'}
+                      >
+                        Facebook
+                      </Typography>
+                    </Stack>
+                  </Button>
+                  <Button
+                    onClick={handleLoginGoogle}
+                    variant="contained"
+                    sx={{
+                      height: 48,
+                      background: '#FFF5F5',
+                      boxShadow: 'none',
+                      width: 175,
+                    }}
+                  >
+                    <Stack
+                      direction={'row'}
+                      alignItems={'center'}
+                      justifyContent="center"
+                      gap={2}
+                      px={1}
+                    >
+                      <Image
+                        src="/assets/images/social/gg-square.svg"
+                        width={24}
+                        height={24}
+                        alt=""
+                      />
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight={500}
+                        color={'secondary'}
+                      >
+                        Google
+                      </Typography>
+                    </Stack>
+                  </Button>
+                </Stack>
+              </Stack>
+            )}
+            {step === 2 && (
+              <Button
+                variant="text"
+                onClick={() => setStep(1)}
+                sx={{ textTransform: 'inherit', mt: 2, p: 0 }}
               >
-                Quy định về mật khẩu
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                color={'secondary'}
-                sx={{ fontWeight: 400 }}
+                <Typography
+                  variant="body1"
+                  sx={{ color: '#ED1E24', fontWeight: 600 }}
+                  textAlign="center"
+                >
+                  Thay đổi số điện thoại
+                </Typography>
+              </Button>
+            )}
+            {step === 3 && (
+              <Stack
+                bgcolor={'#FFF5F5'}
+                px={3}
+                py={1.5}
+                borderRadius={2}
+                gap={1}
+                mt={4}
               >
-                1. Từ 8 đến 32 ký tự
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                color={'secondary'}
-                sx={{ fontWeight: 400 }}
-              >
-                2. Chứa các kí tự thuộc tất cả các nhóm sau:
-              </Typography>
-              <Stack direction={'row'} gap={2}>
                 <Typography
                   variant="subtitle1"
                   color={'secondary'}
-                  sx={{ fontWeight: 400, flex: 1 }}
+                  sx={{ fontWeight: 500 }}
                 >
-                  a. Ký tự tiếng Anh viết hoa (A-Z) <br />
-                  b. Ký tự tiếng Anh viết thường (a-z)
+                  Quy định về mật khẩu
                 </Typography>
                 <Typography
                   variant="subtitle1"
                   color={'secondary'}
-                  sx={{ fontWeight: 400, flex: 1 }}
+                  sx={{ fontWeight: 400 }}
                 >
-                  c. Ký tự số (0-9)
-                  <br /> d. Ký tự đặc biệt (!~*@^&)
+                  1. Từ 8 đến 32 ký tự
                 </Typography>
+                <Typography
+                  variant="subtitle1"
+                  color={'secondary'}
+                  sx={{ fontWeight: 400 }}
+                >
+                  2. Chứa các kí tự thuộc tất cả các nhóm sau:
+                </Typography>
+                <Stack direction={'row'} gap={2}>
+                  <Typography
+                    variant="subtitle1"
+                    color={'secondary'}
+                    sx={{ fontWeight: 400, flex: 1 }}
+                  >
+                    a. Ký tự tiếng Anh viết hoa (A-Z) <br />
+                    b. Ký tự tiếng Anh viết thường (a-z)
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    color={'secondary'}
+                    sx={{ fontWeight: 400, flex: 1 }}
+                  >
+                    c. Ký tự số (0-9)
+                    <br /> d. Ký tự đặc biệt (!~*@^&)
+                  </Typography>
+                </Stack>
               </Stack>
-            </Stack>
-          )}
-        </Box>
-      </Container>
-    </JustifyBox>
+            )}
+          </Box>
+        </Container>
+      </JustifyBox>
+
+      <PopupNotification
+        title={''}
+        open={open}
+        onCloseModal={handleClose}
+        cancelText="Đóng"
+      >
+        <JustifyBox flexDirection={'column'} gap={4}>
+          <Image
+            src={'/assets/images/common/error.svg'}
+            width={124}
+            height={124}
+            alt=""
+          />
+          <MuiTypography
+            variant="subtitle2"
+            fontSize={'1.125rem'}
+            color={'secondary'}
+          >
+            {errors?.errorMsg}
+          </MuiTypography>
+        </JustifyBox>
+      </PopupNotification>
+    </>
   )
 }

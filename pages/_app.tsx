@@ -15,6 +15,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { SessionProvider } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
+import '@/assets/scss/material-kit-react.scss?v=1.9.0'
 import '../styles/globals.scss'
 const isProd = process.env.NODE_ENV === 'production'
 
