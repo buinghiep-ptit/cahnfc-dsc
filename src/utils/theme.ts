@@ -91,10 +91,10 @@ export let theme = createTheme({
       },
       styleOverrides: {
         root: {
-          '&.Mui-disabled': {
-            background: '#ADB5BD',
-            color: '#FFFFFF',
-          },
+          // '&.Mui-disabled': {
+          //   background: '#ADB5BD',
+          //   color: '#FFFFFF',
+          // },
         },
       },
       variants: [
@@ -104,6 +104,10 @@ export let theme = createTheme({
             color: 'primary',
           },
           style: {
+            '&.Mui-disabled': {
+              background: '#ADB5BD',
+              color: '#FFFFFF',
+            },
             textTransform: 'none',
             color: 'white',
             fontSize: '1rem',

@@ -151,7 +151,8 @@ export default function SignIn(props: IProps) {
   return (
     <>
       {isLogging && <AppLoading />}
-      <JustifyBox
+      <Stack
+        py={6}
         minHeight={'100vh'}
         sx={{
           backgroundPosition: 'center',
@@ -367,7 +368,7 @@ export default function SignIn(props: IProps) {
             </Link>
           </Box>
         </Container>
-      </JustifyBox>
+      </Stack>
 
       <PopupNotification
         title={''}

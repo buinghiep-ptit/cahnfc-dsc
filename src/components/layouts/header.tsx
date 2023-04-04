@@ -41,12 +41,12 @@ export const navItems = [
 ]
 
 interface StyledAppBarProps {
-  changeColorOnScroll?: any
+  changecoloronscroll?: any
   open?: boolean
 }
 
 const StyledAppBar = styled(AppBar)<StyledAppBarProps>(
-  ({ open, changeColorOnScroll, theme }) => {
+  ({ open, changecoloronscroll, theme }) => {
     return {
       display: 'flex',
       border: '0',
@@ -54,7 +54,7 @@ const StyledAppBar = styled(AppBar)<StyledAppBarProps>(
       borderRadius: '3px',
       color: '#555',
       width: '100%',
-      backgroundColor: open && changeColorOnScroll ? 'transparent' : '#ED1E24',
+      backgroundColor: open && changecoloronscroll ? 'transparent' : '#ED1E24',
       boxShadow: open
         ? 'none'
         : '0 4px 18px 0px rgba(0, 0, 0, 0.12), 0 7px 10px -5px rgba(0, 0, 0, 0.15)',
@@ -268,7 +268,7 @@ export function HeaderNavbar(props: Props) {
 
   return (
     <Box component="header" sx={{ display: 'flex', px: 0 }}>
-      <StyledAppBar open={open} changeColorOnScroll={changeColorOnScroll}>
+      <StyledAppBar open={open} changecoloronscroll={changeColorOnScroll}>
         <Container>
           <Toolbar
             sx={{

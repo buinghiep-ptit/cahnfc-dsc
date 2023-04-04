@@ -1,8 +1,7 @@
 /* eslint-disable import/no-unresolved */
-import { registerOTP, resendOTP, setPassword, validateOTP } from '@/api-client'
+import { resendOTP } from '@/api-client'
 import AppLoading from '@/components/commons/AppLoading'
 import { MuiButton } from '@/components/commons/MuiButton'
-import { MuiRHFCheckBox } from '@/components/commons/MuiRHFCheckBox'
 import { MuiRHFInputText } from '@/components/commons/MuiRHFTextInput'
 import { MuiTypography } from '@/components/commons/MuiTypography'
 import { OtpInput } from '@/components/commons/otp-input'
@@ -20,7 +19,6 @@ import {
   Typography,
 } from '@mui/material'
 import _ from 'lodash'
-import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import * as React from 'react'
@@ -33,14 +31,14 @@ type SchemaType = {
   phoneNumber?: string
   password?: string
   passwordConfirmation?: string
-  isAgree?: boolean
 }
 
-export default function SignUp(props: IProps) {
+export default function ForgotPassword(props: IProps) {
   const router = useRouter()
   const { next } = router.query
   const [otp, setOtp] = React.useState('')
-  const [step, setStep] = React.useState(3)
+  const [step, setStep] = React.useState(1)
+  const [isResend, setIsResend] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
   const [errors, setErrors] = React.useState<{ errorMsg?: string }>()
   const [showPassword, setShowPassword] = React.useState<{
@@ -74,7 +72,7 @@ export default function SignUp(props: IProps) {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [countDown, step])
+  }, [countDown, step, isResend])
 
   const phoneRegExp =
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
@@ -120,58 +118,14 @@ export default function SignUp(props: IProps) {
   })
 
   const methods = useForm({
-    defaultValues: {
-      isAgree: false,
-      phoneNumber: '',
-      password: '',
-      passwordConfirmation: '',
-    },
+    defaultValues: { phoneNumber: '', password: '', passwordConfirmation: '' },
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
 
-  const isAgree = methods.watch('isAgree')
   const phoneNumber = methods.watch('phoneNumber')
   const password = methods.watch('password')
   const repassword = methods.watch('passwordConfirmation')
-
-  const handleLoginFacebook = async () => {
-    setIsLoading(true)
-
-    const result = await signIn('facebook', {
-      callbackUrl: next ? (next as string) : '',
-      redirect: false,
-    })
-
-    if (result?.error) {
-      setErrors(prev => ({
-        ...prev,
-        errorMsg: 'Đăng nhập không thành công, vui lòng thử lại!',
-      }))
-      setOpen(true)
-    } else {
-      setErrors(undefined)
-    }
-    setIsLoading(false)
-  }
-
-  const handleLoginGoogle = async () => {
-    setIsLoading(true)
-    const result = await signIn('google', {
-      callbackUrl: next ? (next as string) : '',
-      redirect: false,
-    })
-    if (result?.error) {
-      setErrors(prev => ({
-        ...prev,
-        errorMsg: 'Đăng nhập không thành công, vui lòng thử lại!',
-      }))
-      setOpen(true)
-    } else {
-      setErrors(undefined)
-    }
-    setIsLoading(false)
-  }
 
   const handleClickShowPassword = () => {
     setShowPassword(prev => ({
@@ -184,22 +138,22 @@ export default function SignUp(props: IProps) {
     values: SchemaType,
   ) => {
     try {
-      if (step === 1) {
-        const result = await registerOTP({ phoneNumber: values.phoneNumber })
-      } else if (step === 2) {
-        const result = await validateOTP({
-          phoneNumber: values.phoneNumber,
-          otp: otp,
-        })
-      } else {
-        const result = await setPassword({
-          password: values.password,
-          deviceId: '451796cc-9e5f-4424-8bf8-c1e6040b6d47',
-          returnRefreshToken: true,
-        })
+      // if (step === 1) {
+      //   const result = await registerOTP({ phoneNumber: values.phoneNumber })
+      // } else if (step === 2) {
+      //   const result = await validateOTP({
+      //     phoneNumber: values.phoneNumber,
+      //     otp: otp,
+      //   })
+      // } else {
+      //   const result = await setPassword({
+      //     password: values.password,
+      //     deviceId: '451796cc-9e5f-4424-8bf8-c1e6040b6d47',
+      //     returnRefreshToken: true,
+      //   })
 
-        router.push('/')
-      }
+      //   router.push('/')
+      // }
       setStep(step + 1)
     } catch (error) {
       const msgStr = getMessageString(error as any)
@@ -226,11 +180,11 @@ export default function SignUp(props: IProps) {
   const getStepLabel = (step: number) => {
     switch (step) {
       case 1:
-        return 'Đăng ký'
+        return 'Quên mật khẩu'
       case 2:
-        return 'Xác nhận tài khoản'
+        return 'Xác thực OTP'
       case 3:
-        return 'Thiết lập mật khẩu'
+        return 'Tạo mật khẩu'
 
       default:
         return ''
@@ -238,7 +192,10 @@ export default function SignUp(props: IProps) {
   }
 
   const resendOTPRegister = async () => {
-    await resendOTP({ phone: phoneNumber, otpType: 'REGISTER' })
+    setOtp('')
+    setIsResend(true)
+    setCountDown(60)
+    await resendOTP({ phone: phoneNumber, otpType: 'FORGOT_PASSWORD' })
   }
 
   return (
@@ -307,7 +264,7 @@ export default function SignUp(props: IProps) {
                     <>
                       <Stack gap={1.5}>
                         <Typography variant="body1" color={'secondary'}>
-                          Sử dụng số điện thoại để đăng ký tài khoản
+                          Sử dụng số điện thoại để lấy lại mật khẩu
                         </Typography>
                         <MuiRHFInputText
                           inputRef={inputRef}
@@ -318,23 +275,6 @@ export default function SignUp(props: IProps) {
                           defaultValue=""
                           placeholder="Nhập số điện thoại"
                           autoFocus
-                        />
-                      </Stack>
-                      <Stack direction={'row'} gap={2} alignItems="flex-start">
-                        <MuiRHFCheckBox
-                          name="isAgree"
-                          label={
-                            <Typography variant="body1" color={'secondary'}>
-                              Bằng việc đăng ký, bạn đã đồng ý với CAHN FC về{' '}
-                              <span style={{ fontWeight: 500 }}>
-                                Điều khoản sử dụng{' '}
-                              </span>{' '}
-                              và{' '}
-                              <span style={{ fontWeight: 500 }}>
-                                Chính sách bảo mật!
-                              </span>
-                            </Typography>
-                          }
                         />
                       </Stack>
                     </>
@@ -382,14 +322,14 @@ export default function SignUp(props: IProps) {
                     <>
                       <Stack gap={1.5}>
                         <Typography variant="body1" color={'secondary'}>
-                          Nhập mật khẩu
+                          Mật khẩu mới
                         </Typography>
                         <MuiRHFInputText
                           label={'Mật khẩu'}
                           type={showPassword.visibility ? 'text' : 'password'}
                           name="password"
                           defaultValue=""
-                          placeholder="Nhập mật khẩu"
+                          placeholder="Nhập mật khẩu mới"
                           iconEnd={
                             <IconButton
                               onClick={handleClickShowPassword}
@@ -438,7 +378,7 @@ export default function SignUp(props: IProps) {
 
                   <MuiButton
                     disabled={
-                      (step === 1 && (!isAgree || !phoneNumber)) ||
+                      (step === 1 && !phoneNumber) ||
                       (step === 2 && otp.length < 6) ||
                       (step === 3 && (!password || !repassword)) ||
                       !_.isEmpty(methods.formState.errors)
@@ -451,103 +391,12 @@ export default function SignUp(props: IProps) {
                       height: 48,
                       mt: 1.5,
                     }}
-                    title={step === 1 ? 'Đăng ký' : 'Tiếp tục'}
+                    title={step === 1 ? 'Gửi' : 'Tiếp tục'}
                   />
                 </Stack>
               </FormProvider>
             </form>
-            {step === 1 && (
-              <Stack mt={4} gap={2}>
-                <Typography
-                  variant="body1"
-                  color={'secondary'}
-                  textAlign="center"
-                >
-                  Hoặc đăng nhập bằng
-                </Typography>
-                <Stack direction={'row'} gap={3} justifyContent="center">
-                  <Button
-                    onClick={handleLoginFacebook}
-                    variant="contained"
-                    sx={{
-                      height: 48,
-                      background: '#E7F5FF',
-                      boxShadow: 'none',
-                      width: 175,
-                    }}
-                  >
-                    <Stack
-                      direction={'row'}
-                      alignItems={'center'}
-                      justifyContent="center"
-                      gap={2}
-                      px={1}
-                    >
-                      <Image
-                        src="/assets/images/social/fb-square.svg"
-                        width={24}
-                        height={24}
-                        alt=""
-                      />
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight={500}
-                        color={'secondary'}
-                      >
-                        Facebook
-                      </Typography>
-                    </Stack>
-                  </Button>
-                  <Button
-                    onClick={handleLoginGoogle}
-                    variant="contained"
-                    sx={{
-                      height: 48,
-                      background: '#FFF5F5',
-                      boxShadow: 'none',
-                      width: 175,
-                    }}
-                  >
-                    <Stack
-                      direction={'row'}
-                      alignItems={'center'}
-                      justifyContent="center"
-                      gap={2}
-                      px={1}
-                    >
-                      <Image
-                        src="/assets/images/social/gg-square.svg"
-                        width={24}
-                        height={24}
-                        alt=""
-                      />
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight={500}
-                        color={'secondary'}
-                      >
-                        Google
-                      </Typography>
-                    </Stack>
-                  </Button>
-                </Stack>
-              </Stack>
-            )}
-            {step === 2 && (
-              <Button
-                variant="text"
-                onClick={() => setStep(1)}
-                sx={{ textTransform: 'inherit', mt: 2, p: 0 }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{ color: '#ED1E24', fontWeight: 600 }}
-                  textAlign="center"
-                >
-                  Thay đổi số điện thoại
-                </Typography>
-              </Button>
-            )}
+
             {step === 3 && (
               <Stack
                 bgcolor={'#FFF5F5'}
