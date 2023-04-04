@@ -75,6 +75,18 @@ export const registerOTP = async (params: {
   return data
 }
 
+export const resendOTP = async (params: {
+  phone?: string
+  email?: string
+  otpType?: 'REGISTER' | 'FORGOT_PASSWORD'
+}): Promise<{ verify?: string }> => {
+  const { data } = await http.post<any, AxiosResponse<{ verify?: string }>>(
+    '/auth/api/customer/register',
+    params,
+  )
+  return data
+}
+
 export const validateOTP = async (params: {
   phoneNumber?: string
   otp?: string

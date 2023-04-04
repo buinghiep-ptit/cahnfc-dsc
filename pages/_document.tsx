@@ -37,8 +37,8 @@ export default class MyDocument extends Document {
           )}
           {/* PWA primary color */}
           <meta name="theme-color" content={theme.palette.primary.main} />
-          <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-          <link rel="shortcut icon" href="/static/favicon.ico" />
+          <link rel="icon" type="image/x-icon" href="/favicon.svg" />
+          <link rel="shortcut icon" href="/favicon.svg" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link

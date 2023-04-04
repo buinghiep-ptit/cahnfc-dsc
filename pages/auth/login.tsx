@@ -16,15 +16,12 @@ export default function SignIn(props: ILoginPageProps) {
       password: 'Buivannghiep91',
       callbackUrl: next ? (next as string) : '',
     })
-    console.log('res:', res)
   }
-  console.log('status:', status)
 
   const handleLoginFacebook = async () => {
     const res = await signIn('facebook', {
       callbackUrl: next ? (next as string) : '',
     })
-    console.log('facebook:', res)
   }
 
   const handleLoginGoogle = async () => {
@@ -32,12 +29,10 @@ export default function SignIn(props: ILoginPageProps) {
       callbackUrl: next ? (next as string) : '',
       // uselessWindow: true,
     })
-    console.log('google:', res)
   }
 
   const handleLoginApple = async () => {
     const res = await signIn('apple')
-    console.log('apple:', res)
   }
 
   const handleSignUp = () => {

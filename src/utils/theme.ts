@@ -89,6 +89,14 @@ export let theme = createTheme({
       defaultProps: {
         disableRipple: false,
       },
+      styleOverrides: {
+        root: {
+          '&.Mui-disabled': {
+            background: '#ADB5BD',
+            color: '#FFFFFF',
+          },
+        },
+      },
       variants: [
         {
           props: {

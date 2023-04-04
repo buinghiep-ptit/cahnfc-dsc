@@ -106,10 +106,8 @@ export const HorizontalScroll = ({ children }: any) => {
     setImg((imgRef as any).current.offsetWidth)
   }, [])
 
-  console.log('img:', img)
   function onLeftClick() {
     const xPos = translateXForElement(dragRef.current)
-    console.log('l:', xPos)
     const newXPosition = xPos + img + 20
 
     animation.start({

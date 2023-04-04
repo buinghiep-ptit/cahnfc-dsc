@@ -24,7 +24,6 @@ export function AccordionRanking() {
 
   const extractItems = (items: IRank[]) => {
     const idx = items.findIndex(item => item.isMyTeam)
-    console.log('idx:', idx)
     if (!expanded) {
       if (idx < 4) return [...items.slice(0, 4)]
       else return [...items.slice(0, 3), ...items.slice(idx, idx + 1)]

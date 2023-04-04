@@ -24,10 +24,12 @@ interface Props {
   rightIcon?: React.ReactElement | null | boolean
   fixed?: boolean
   color: 'transparent' | 'white' | 'dark'
-  changeColorOnScroll: {
-    height: number
-    color: 'white' | 'dark'
-  }
+  changeColorOnScroll:
+    | {
+        height: number
+        color: 'white' | 'dark'
+      }
+    | undefined
 }
 
 const drawerWidth = 240
@@ -39,26 +41,29 @@ export const navItems = [
 ]
 
 interface StyledAppBarProps {
+  changeColorOnScroll?: any
   open?: boolean
 }
 
-const StyledAppBar = styled(AppBar)<StyledAppBarProps>(({ open, theme }) => {
-  return {
-    display: 'flex',
-    border: '0',
-    padding: '1rem 0',
-    borderRadius: '3px',
-    color: '#555',
-    width: '100%',
-    backgroundColor: open ? 'transparent' : '#ED1E24',
-    boxShadow: open
-      ? 'none'
-      : '0 4px 18px 0px rgba(0, 0, 0, 0.12), 0 7px 10px -5px rgba(0, 0, 0, 0.15)',
-    transition: 'all .3s ease-out 0s',
-    position: 'fixed',
-    zIndex: '1100',
-  }
-})
+const StyledAppBar = styled(AppBar)<StyledAppBarProps>(
+  ({ open, changeColorOnScroll, theme }) => {
+    return {
+      display: 'flex',
+      border: '0',
+      padding: '1rem 0',
+      borderRadius: '3px',
+      color: '#555',
+      width: '100%',
+      backgroundColor: open && changeColorOnScroll ? 'transparent' : '#ED1E24',
+      boxShadow: open
+        ? 'none'
+        : '0 4px 18px 0px rgba(0, 0, 0, 0.12), 0 7px 10px -5px rgba(0, 0, 0, 0.15)',
+      transition: 'all .3s ease-out 0s',
+      position: 'fixed',
+      zIndex: '1100',
+    }
+  },
+)
 export interface IRoute {
   name?: string
   icon?: React.ReactElement
@@ -171,7 +176,7 @@ export function HeaderNavbar(props: Props) {
       collapse: session
         ? [
             {
-              name: 'Thông tin cá nhân',
+              name: 'Tài khoản',
               route: '/profile',
             },
             {
@@ -193,6 +198,7 @@ export function HeaderNavbar(props: Props) {
   ]
 
   const headerColorChange = () => {
+    if (!changeColorOnScroll) return
     const windowsScrollTop = window.pageYOffset
     if (windowsScrollTop > changeColorOnScroll.height) {
       setOpen(false)
@@ -262,7 +268,7 @@ export function HeaderNavbar(props: Props) {
 
   return (
     <Box component="header" sx={{ display: 'flex', px: 0 }}>
-      <StyledAppBar open={open}>
+      <StyledAppBar open={open} changeColorOnScroll={changeColorOnScroll}>
         <Container>
           <Toolbar
             sx={{
@@ -333,22 +339,6 @@ export function HeaderNavbar(props: Props) {
                 {renderRoutesRight}
               </Stack>
             )}
-            {/* {session ? (
-              <CustomDropdown
-                name={'User'}
-                route={'/user-info'}
-                collapse={[
-                  {
-                    name: 'Thông tin tài khoản',
-                    route: '/user-info',
-                  },
-                  {
-                    name: 'Đăng xuất',
-                    callBack: () => handleSignOut(),
-                  },
-                ]}
-              />
-            ) : null} */}
           </Toolbar>
         </Container>
       </StyledAppBar>

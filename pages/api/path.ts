@@ -19,8 +19,6 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>,
 ) {
-  console.log('caller proxy:')
-
   return new Promise((resolve, reject) => {
     //convert cookies to header Authorization
     // const cookies = new Cookies(req, res);
@@ -41,7 +39,6 @@ export default function handler(
     proxy.web(req, res, option)
 
     proxy.once('proxyRes', () => {
-      console.log('proxyRes')
       resolve(true)
     })
   })

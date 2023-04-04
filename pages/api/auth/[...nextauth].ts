@@ -139,9 +139,7 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
         else if (new URL(url).origin === baseUrl) return url
         return baseUrl
       },
-      register: async ({ phoneNumber, otp }: Record<string, string>) => {
-        console.log(phoneNumber, otp)
-      },
+      register: async ({ phoneNumber, otp }: Record<string, string>) => {},
       jwt: async ({
         token,
         user,

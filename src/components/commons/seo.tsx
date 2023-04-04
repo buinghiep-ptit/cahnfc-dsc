@@ -86,12 +86,12 @@ const favicons: Array<Favicons> = [
 ]
 
 const defaultMeta = {
-  title: 'Campdi Home',
-  site_name: 'Campdi',
-  description:
-    'A Project Camping using TypeScript, Zustand with Immer, Mui5 and Tailwind CSS',
-  url: 'https://fpttelecom.net.vn',
-  image: 'https://fpttelecom.net.vn/themes/fpt/assets/images/logo.png',
+  title: 'CAHNFC Home',
+  site_name: 'cahnfc',
+  description: 'Câu lạc bộ bóng đá Công an Hà Nội',
+  url: 'https://cahnfc.com/',
+  image:
+    'https://dev09-api.campdi.vn/upload/api/image?fileName=Feed/campdi_1680623843038_326_compressed.jpeg',
   type: 'website',
   robots: 'follow, index',
 }

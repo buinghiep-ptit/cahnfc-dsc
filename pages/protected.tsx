@@ -10,7 +10,6 @@ const Protected = () => {
   useEffect(() => {
     ;(async () => {
       const s = await getSession()
-      console.log('ss:', s)
     })()
   }, [])
   return (

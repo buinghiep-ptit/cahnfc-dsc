@@ -1,3 +1,11 @@
+import AppLoading from '@/components/commons/AppLoading'
+import { MuiButton } from '@/components/commons/MuiButton'
+import { MuiRHFInputText } from '@/components/commons/MuiRHFTextInput'
+import { MuiTypography } from '@/components/commons/MuiTypography'
+import { PopupNotification } from '@/components/commons/PopupNotification'
+import { JustifyBox } from '@/components/home/CAHNTV'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -6,26 +14,19 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
+import _ from 'lodash'
+import { signIn, useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import * as React from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { MuiRHFInputText } from '@/components/commons/MuiRHFTextInput'
-import { JustifyBox } from '@/components/home/CAHNTV'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
-import Image from 'next/image'
-import Link from 'next/link'
-import { signIn, useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
-import { MuiButton } from '@/components/commons/MuiButton'
-import { PopupNotification } from '@/components/commons/PopupNotification'
-import { MuiTypography } from '@/components/commons/MuiTypography'
-import AppLoading from '@/components/commons/AppLoading'
 
 export interface IProps {}
 
 type SchemaType = {
-  mobilePhone?: string
+  phoneNumber?: string
   password?: string
 }
 
@@ -50,7 +51,7 @@ export default function SignIn(props: IProps) {
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
   const validationSchema = Yup.object().shape({
-    mobilePhone: Yup.string()
+    phoneNumber: Yup.string()
       .matches(phoneRegExp, {
         message: 'Số điện thoại không hợp lệ',
         excludeEmptyString: true,
@@ -61,19 +62,18 @@ export default function SignIn(props: IProps) {
         }
         return val.length == 0 || val.length === 10
       })
-      .required('messages.MSG1'),
-    password: Yup.string().required('messages.MSG1'),
+      .required('Giá trị bắt buộc'),
+    password: Yup.string().required('Giá trị bắt buộc'),
   })
 
   const methods = useForm({
-    defaultValues: {},
+    defaultValues: { phoneNumber: '', password: '' },
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log(values)
-    handleLoginPhone()
+    handleLoginPhone(values.phoneNumber ?? '', values.password ?? '')
   }
 
   const handleClickShowPassword = () => {
@@ -83,11 +83,11 @@ export default function SignIn(props: IProps) {
     }))
   }
 
-  const handleLoginPhone = async () => {
+  const handleLoginPhone = async (phoneNumber: string, password: string) => {
     setIsLogging(true)
     await signIn('credentials', {
-      phoneNumber: '0975452751',
-      password: 'Buivannghiep92',
+      phoneNumber: phoneNumber,
+      password: password,
       callbackUrl: next ? (next as string) : '',
       redirect: false,
     }).then(({ ok, error }: any) => {
@@ -214,7 +214,7 @@ export default function SignIn(props: IProps) {
                       label={'Số điện thoại'}
                       required
                       type="text"
-                      name="mobilePhone"
+                      name="phoneNumber"
                       defaultValue=""
                       placeholder="Nhập số điện thoại"
                       autoFocus={true}
@@ -261,7 +261,8 @@ export default function SignIn(props: IProps) {
                   </Link>
 
                   <MuiButton
-                    onClick={handleLoginPhone}
+                    disabled={!_.isEmpty(methods.formState.errors)}
+                    type="submit"
                     variant="contained"
                     loading={isLogging}
                     sx={{

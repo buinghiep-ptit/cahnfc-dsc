@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import { registerOTP, setPassword, validateOTP } from '@/api-client'
+import { registerOTP, resendOTP, setPassword, validateOTP } from '@/api-client'
 import AppLoading from '@/components/commons/AppLoading'
 import { MuiButton } from '@/components/commons/MuiButton'
 import { MuiRHFCheckBox } from '@/components/commons/MuiRHFCheckBox'
@@ -49,6 +49,7 @@ export default function SignUp(props: IProps) {
     visibility: false,
   })
   const [open, setOpen] = React.useState(false)
+  const [countDown, setCountDown] = React.useState(60)
 
   const inputRef = React.useRef<any>(null)
 
@@ -62,6 +63,18 @@ export default function SignUp(props: IProps) {
       clearTimeout(timeout)
     }
   }, [])
+
+  React.useEffect(() => {
+    if (step !== 2) {
+      setCountDown(60)
+      return
+    }
+    const interval = setInterval(() => {
+      if (!!countDown) setCountDown(countDown - 1)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [countDown, step])
 
   const phoneRegExp =
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
@@ -82,21 +95,27 @@ export default function SignUp(props: IProps) {
     password:
       step === 3
         ? Yup.string()
-            .required('messages.MSG1')
-            .test('latinChars', 'messages.MSG21', value => {
+            .required('Giá trị bắt buộc')
+            .test('latinChars', 'Mật khẩu không hợp lệ', value => {
               const regexStr = /^[\x20-\x7E]+$/
               if (value) {
                 return regexStr.test(value)
               } else return false
             })
-            .matches(/^\S*$/, 'messages.MSG21')
-            .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, 'messages.MSG20')
+            .matches(/^\S*$/, 'Mật khẩu không hợp lệ')
+            .matches(
+              /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!~*@^&])[A-Za-z0-9!~*@^&]{8,32}$/g,
+              'Mật khẩu không hợp lệ',
+            )
         : Yup.string().notRequired(),
     passwordConfirmation:
       step === 3
         ? Yup.string()
-            .oneOf([Yup.ref('newPassword'), null], 'messages.MSG11')
-            .required('messages.MSG1')
+            .oneOf(
+              [Yup.ref('password'), null],
+              'Nhập lại mật khẩu chưa chính xác',
+            )
+            .required('Giá trị bắt buộc')
         : Yup.string().notRequired(),
   })
 
@@ -157,7 +176,6 @@ export default function SignUp(props: IProps) {
   const onSubmitHandler: SubmitHandler<SchemaType> = async (
     values: SchemaType,
   ) => {
-    console.log(values)
     try {
       if (step === 1) {
         const result = await registerOTP({ phoneNumber: values.phoneNumber })
@@ -177,7 +195,6 @@ export default function SignUp(props: IProps) {
       }
       setStep(step + 1)
     } catch (error) {
-      console.log(error)
       const msgStr = getMessageString(error as any)
       setErrors(prev => ({
         ...prev,
@@ -193,10 +210,6 @@ export default function SignUp(props: IProps) {
       return
     }
     setStep(step - 1)
-  }
-
-  const handleClickOpen = () => {
-    setOpen(true)
   }
 
   const handleClose = () => {
@@ -215,6 +228,10 @@ export default function SignUp(props: IProps) {
       default:
         return ''
     }
+  }
+
+  const resendOTPRegister = async () => {
+    await resendOTP({ phone: phoneNumber, otpType: 'REGISTER' })
   }
 
   return (
@@ -254,12 +271,12 @@ export default function SignUp(props: IProps) {
             width={{ xs: '100%', md: '70%' }}
             px={{ xs: 2, md: 12 }}
             gap={2}
-            py={4.5}
+            py={3.5}
             display={'flex'}
             flexDirection="column"
             justifyContent="center"
           >
-            <Stack alignItems={'center'} pb={3} gap={2}>
+            <Stack alignItems={'center'} pb={1} gap={2}>
               <Image
                 src="/assets/images/logo-border.svg"
                 width={108}
@@ -277,7 +294,7 @@ export default function SignUp(props: IProps) {
               autoComplete="off"
             >
               <FormProvider {...methods}>
-                <Stack gap={2.5}>
+                <Stack gap={2}>
                   {step === 1 && (
                     <>
                       <Stack gap={1.5}>
@@ -330,12 +347,26 @@ export default function SignUp(props: IProps) {
                           setOtp(val)
                         }}
                       />
-                      <Typography variant="body1" color={'secondary'}>
-                        Chưa nhận được mã OTP?{' '}
-                        <span style={{ fontWeight: 500 }}>
-                          Gửi lại sau: 30s
-                        </span>
-                      </Typography>
+                      <Button
+                        disabled={!!countDown}
+                        onClick={resendOTPRegister}
+                        variant="text"
+                        sx={{ textTransform: 'inherit' }}
+                      >
+                        <Typography variant="body1" color={'secondary'}>
+                          Chưa nhận được mã OTP?{' '}
+                          <span
+                            style={{
+                              fontWeight: 500,
+                              color: countDown ? 'inherit' : '#ED1E24',
+                            }}
+                          >
+                            {countDown
+                              ? `Gửi lại sau: ${countDown}s`
+                              : 'Gửi lại'}
+                          </span>
+                        </Typography>
+                      </Button>
                     </JustifyBox>
                   )}
 
@@ -515,7 +546,7 @@ export default function SignUp(props: IProps) {
                 py={1.5}
                 borderRadius={2}
                 gap={1}
-                mt={4}
+                mt={2}
               >
                 <Typography
                   variant="subtitle1"
