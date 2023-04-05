@@ -30,9 +30,11 @@ type Props = {
    * e.g: /[0-9]{1}/ for digits only or /[0-9a-zA-Z]{1}/ for alphanumeric
    */
   validationPattern?: RegExp
+
+  isPriorityFocus?: boolean
 } & PartialInputProps
 
-export const OtpInput = (props: Props) => {
+export const OtpInput = ({ isPriorityFocus = true, ...props }: Props) => {
   const {
     //Set the default size to 6 characters
     size = 6,
@@ -100,7 +102,9 @@ export const OtpInput = (props: Props) => {
       {arr.map((_, index) => {
         return (
           <input
-            ref={input => index === 0 && !isFocused && input?.focus()}
+            ref={input =>
+              isPriorityFocus && index === 0 && !isFocused && input?.focus()
+            }
             key={index}
             {...restProps}
             /**

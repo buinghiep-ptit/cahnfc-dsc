@@ -1,5 +1,6 @@
 // import { authApi } from '@/api-client'
 import { getProfile } from '@/api-client'
+import { Profile } from '@/components/profile'
 import { withAuth } from '@/HOCs'
 import { PrimaryLayout } from '@/layouts'
 import { GetServerSidePropsContext } from 'next'
@@ -18,7 +19,7 @@ function ProfilePage(props: IProfilePageProps) {
       alert(error)
     }
   }
-  return <div></div>
+  return <Profile />
 }
 // export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 //   return {

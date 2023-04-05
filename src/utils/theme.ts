@@ -95,6 +95,7 @@ export let theme = createTheme({
           //   background: '#ADB5BD',
           //   color: '#FFFFFF',
           // },
+          textTransform: 'none',
         },
       },
       variants: [
@@ -135,6 +136,30 @@ export let theme = createTheme({
           },
         },
       ],
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          // color: palette.secondary,
+          '&.Mui-checked': {
+            color: '#ED1E24',
+          },
+        },
+      },
+    },
+    MuiFormControlLabel: {
+      styleOverrides: {
+        root: {
+          display: 'block',
+        },
+
+        label: {
+          display: 'inline-block',
+          fontSize: '1rem',
+          fontWeight: 500,
+          color: '#212529',
+        },
+      },
     },
     MuiOutlinedInput: {
       styleOverrides: {
@@ -255,8 +280,8 @@ export let theme = createTheme({
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#495057',
-      light: '#3FC79A',
+      main: '#212529',
+      light: '#495057',
       dark: '#0B815A',
       contrastText: '#868E96',
     },

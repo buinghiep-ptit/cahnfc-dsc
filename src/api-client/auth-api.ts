@@ -18,7 +18,7 @@ type LoginSocialPayload = {
   returnRefreshToken?: boolean
 }
 
-type AuthResponse = {
+export type AuthResponse = {
   accessToken?: string
   expiresIn?: number
   created?: number
@@ -78,7 +78,13 @@ export const registerOTP = async (params: {
 export const resendOTP = async (params: {
   phone?: string
   email?: string
-  otpType?: 'REGISTER' | 'FORGOT_PASSWORD'
+  otpType?:
+    | 'REGISTER'
+    | 'FORGOT_PASSWORD'
+    | 'LOGIN'
+    | 'CHANGE_PHONE_NUMBER'
+    | 'REMOVE_ACCOUNT'
+    | 'UPDATE_EMAIL'
 }): Promise<{ verify?: string }> => {
   const { data } = await http.post<any, AxiosResponse<{ verify?: string }>>(
     '/auth/api/customer/register',
@@ -98,14 +104,57 @@ export const validateOTP = async (params: {
   return data
 }
 
-export const setPassword = async (params: {
-  password?: string
-  deviceId?: string
-  returnRefreshToken?: boolean
-}): Promise<AuthResponse> => {
+export const setPassword = async (
+  params: {
+    password?: string
+    deviceId?: string
+    returnRefreshToken?: boolean
+  },
+  otpType?:
+    | 'REGISTER'
+    | 'FORGOT_PASSWORD'
+    | 'LOGIN'
+    | 'CHANGE_PHONE_NUMBER'
+    | 'REMOVE_ACCOUNT'
+    | 'UPDATE_EMAIL'
+    | string,
+  token?: string,
+): Promise<AuthResponse> => {
   const { data } = await http.post<any, AxiosResponse<AuthResponse>>(
-    '/auth/api/customer/register/password',
+    `/auth/api/customer/${
+      otpType === 'REGISTER' ? 'register/password' : 'password/new-password'
+    }`,
+    params,
+    {
+      baseURL: process.env.NEXT_PUBLIC_API_URL,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+  return data
+}
+
+// forgot password
+
+export const requestForgotOTP = async (params: {
+  phoneNumber?: string
+}): Promise<{ verify?: string }> => {
+  const { data } = await http.post<any, AxiosResponse<{ verify?: string }>>(
+    '/auth/api/customer/password',
     params,
   )
+  return data
+}
+
+export const validateForgotOTP = async (params: {
+  phoneNumber?: string
+  otp?: string
+}): Promise<{ accessToken?: string }> => {
+  const { data } = await http.post<
+    any,
+    AxiosResponse<{ accessToken?: string }>
+  >('/auth/api/customer/password/validate', params)
   return data
 }

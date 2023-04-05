@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { login, loginSocial, renewToken } from '@/api-client'
+import { login, loginSocial, renewToken, setPassword } from '@/api-client'
 import { getMessageString } from '@/helpers/messageToString'
 import { NextApiRequest, NextApiResponse } from 'next'
 import NextAuth, { NextAuthOptions, SessionStrategy } from 'next-auth'
@@ -74,16 +74,31 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
           phoneNumber: { label: 'PhoneNumber', type: 'text' },
           password: { label: 'Password', type: 'password' },
           deviceId: { label: 'DeviceId', type: 'text' },
+          accessToken: { label: 'AccessToken', type: 'text' },
+          otpType: { label: 'OtpType', type: 'text' },
         },
         authorize: async (credentials, _req) => {
-          const payload = {
-            phoneNumber: credentials!.phoneNumber,
-            password: credentials!.password,
-            returnRefreshToken: true,
-          }
+          console.log('credentials:', credentials)
+          const payload = credentials?.deviceId // isRegister
+            ? {
+                password: credentials?.password,
+                deviceId: credentials?.deviceId,
+                returnRefreshToken: true,
+              }
+            : {
+                phoneNumber: credentials?.phoneNumber,
+                password: credentials?.password,
+                returnRefreshToken: true,
+              }
           try {
-            const user = await login(payload)
-            if (user && (user as any).accessToken) {
+            const user: any = credentials?.deviceId
+              ? await setPassword(
+                  payload,
+                  credentials.otpType ?? 'REGISTER',
+                  credentials?.accessToken,
+                )
+              : await login(payload)
+            if (user && user.accessToken) {
               return user
             }
 
