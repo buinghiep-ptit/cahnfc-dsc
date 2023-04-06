@@ -1,5 +1,5 @@
 /* eslint-disable import/no-named-as-default-member */
-import { FMSwiperSlider } from '@/components/commons/FMSwiperSilder'
+import { Banner } from '@/components/home/banner'
 import { CAHNTV } from '@/components/home/CAHNTV'
 import { Matching } from '@/components/home/Matching'
 import { News } from '@/components/home/News'
@@ -10,12 +10,22 @@ import { TrapezoidInfo } from '@/components/home/TrapezoidInfo'
 import { PrimaryLayout } from '@/layouts'
 import { NextPageWithLayout } from '@/models'
 import { Box, Container } from '@mui/material'
-import { ReactElement } from 'react'
+import { ReactElement, useEffect } from 'react'
 
 const Home: NextPageWithLayout = () => {
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const result = await fetch(
+          `https://cahn-api.campdi.vn:443/store/public/api/categories`,
+        )
+        const data = await result.json()
+      } catch (error) {}
+    })()
+  }, [])
   return (
     <Box position={'relative'} bgcolor={'#ed1e24'}>
-      <FMSwiperSlider />
+      <Banner />
 
       <Box
         pt={9.5}

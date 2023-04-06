@@ -31,10 +31,15 @@ type Props = {
    */
   validationPattern?: RegExp
 
+  disabled?: boolean
   isPriorityFocus?: boolean
 } & PartialInputProps
 
-export const OtpInput = ({ isPriorityFocus = true, ...props }: Props) => {
+export const OtpInput = ({
+  disabled = false,
+  isPriorityFocus = true,
+  ...props
+}: Props) => {
   const {
     //Set the default size to 6 characters
     size = 6,
@@ -106,6 +111,7 @@ export const OtpInput = ({ isPriorityFocus = true, ...props }: Props) => {
               isPriorityFocus && index === 0 && !isFocused && input?.focus()
             }
             key={index}
+            disabled={disabled}
             {...restProps}
             /**
              * Add some styling to the input using daisyUI + tailwind.

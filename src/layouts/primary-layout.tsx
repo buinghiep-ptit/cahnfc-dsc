@@ -1,4 +1,4 @@
-import Seo from '@/components/commons/seo'
+import { Seo } from '@/components/commons/seo'
 import { Footer } from '@/components/layouts'
 import { HeaderNavbar } from '@/components/layouts/header'
 import { Box } from '@mui/system'

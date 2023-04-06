@@ -1,5 +1,5 @@
 import React from 'react'
-export default function AppLoading() {
+export function AppLoading() {
   return (
     <>
       <div className="main-fader">

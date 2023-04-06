@@ -215,7 +215,8 @@ export function TrapezoidInfo(props: IProps) {
               <CountdownTimer targetDate={dateTimeAfterThreeDays} />
               <Typography variant="subtitle2" color={'secondary'}>
                 {weekday(new Date().getDay())},{' '}
-                {moment(new Date()).format('DD/MM/YYYY - HH:mm')} - SVĐ Hàng Đẫy
+                {moment('2023-04-06T10:05:11Z').format('DD/MM/YYYY - HH:mm')} -
+                SVĐ Hàng Đẫy
               </Typography>
             </Stack>
             <Image

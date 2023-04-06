@@ -22,43 +22,43 @@ export function MUICarousel<T>({
   const [activeIndex, setActiveIndex] = React.useState(0)
   const [dotsLen, setDotsLen] = React.useState(0)
 
-  React.useEffect(() => {
-    const x = (cRef as any).current.offsetWidth
-    setDotsLen(Math.ceil((carousel as any).current.scrollWidth / x))
-    const offsetEdge = window.innerWidth - x
-    setW(window.innerWidth - offsetEdge / 2)
-  }, [cRef, carousel])
+  // React.useEffect(() => {
+  //   const x = (cRef as any).current.offsetWidth
+  //   setDotsLen(Math.ceil((carousel as any).current.scrollWidth / x))
+  //   const offsetEdge = window.innerWidth - x
+  //   setW(window.innerWidth - offsetEdge / 2)
+  // }, [cRef, carousel])
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      ;(carousel as any).current.scrollLeft = 0
-    }
-    window.addEventListener('resize', handleResize)
+  // React.useEffect(() => {
+  //   const handleResize = () => {
+  //     ;(carousel as any).current.scrollLeft = 0
+  //   }
+  //   window.addEventListener('resize', handleResize)
 
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
+  //   return () => {
+  //     window.removeEventListener('resize', handleResize)
+  //   }
+  // }, [])
 
-  const handleLeftClick = (e: any) => {
-    e.preventDefault()
-    ;(carousel as any).current.scrollLeft -= (
-      carousel as any
-    ).current.offsetWidth
-    if (activeIndex > 0) setActiveIndex(activeIndex - 1)
-  }
+  // const handleLeftClick = (e: any) => {
+  //   e.preventDefault()
+  //   ;(carousel as any).current.scrollLeft -= (
+  //     carousel as any
+  //   ).current.offsetWidth
+  //   if (activeIndex > 0) setActiveIndex(activeIndex - 1)
+  // }
 
-  const handleRightClick = (e: any) => {
-    e.preventDefault()
-    ;(carousel as any).current.scrollLeft += (
-      carousel as any
-    ).current.offsetWidth
-    if (activeIndex < dotsLen - 1) setActiveIndex(activeIndex + 1)
-  }
+  // const handleRightClick = (e: any) => {
+  //   e.preventDefault()
+  //   ;(carousel as any).current.scrollLeft += (
+  //     carousel as any
+  //   ).current.offsetWidth
+  //   if (activeIndex < dotsLen - 1) setActiveIndex(activeIndex + 1)
+  // }
 
   return (
     <Stack gap={4}>
-      <Stack
+      {/* <Stack
         direction={'row'}
         justifyContent="space-between"
         alignItems={'center'}
@@ -129,7 +129,12 @@ export function MUICarousel<T>({
         </Stack>
       </div>
 
-      <Stack direction={'row'} gap={1} justifyContent="center">
+      <Stack
+        direction={'row'}
+        display={{ xs: 'none', md: 'flex' }}
+        gap={1}
+        justifyContent="center"
+      >
         {Array(dotsLen)
           .fill(0)
           .map((_, idx) => (
@@ -147,7 +152,7 @@ export function MUICarousel<T>({
               zIndex={9}
             ></Box>
           ))}
-      </Stack>
+      </Stack> */}
     </Stack>
   )
 }

@@ -20,7 +20,6 @@ export function AuthContainer({
   errorMsg,
   handleClosePopup,
 }: IProps) {
-  console.log('errorMsg:', errorMsg)
   return (
     <>
       <Stack

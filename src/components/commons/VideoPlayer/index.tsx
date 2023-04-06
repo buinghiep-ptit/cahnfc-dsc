@@ -8,7 +8,7 @@ import { Waypoint } from 'react-waypoint'
 export interface IMediaPlayerProps {
   url: string
 }
-function VideoPlayer({ url }: IMediaPlayerProps) {
+export function VideoPlayer({ url }: IMediaPlayerProps) {
   const [loading, setLoading] = React.useState(true)
 
   const [state, setState] = React.useState({
@@ -127,5 +127,3 @@ function VideoPlayer({ url }: IMediaPlayerProps) {
     </div>
   )
 }
-
-export default VideoPlayer

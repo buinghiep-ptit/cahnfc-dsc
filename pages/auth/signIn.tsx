@@ -1,5 +1,5 @@
 import { AuthContainer } from '@/components/AuthContainer'
-import AppLoading from '@/components/commons/AppLoading'
+import { AppLoading } from '@/components/commons/AppLoading'
 import { MuiButton } from '@/components/commons/MuiButton'
 import { MuiRHFInputText } from '@/components/commons/MuiRHFTextInput'
 import { phoneNumberSchema } from '@/helpers/schemaYup'
@@ -121,7 +121,6 @@ export default function SignIn(props: IProps) {
   }
 
   const handleClose = () => {
-    console.log('vao day')
     setErrors(undefined)
   }
 

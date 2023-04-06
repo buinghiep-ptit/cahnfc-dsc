@@ -78,7 +78,6 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
           otpType: { label: 'OtpType', type: 'text' },
         },
         authorize: async (credentials, _req) => {
-          console.log('credentials:', credentials)
           const payload = credentials?.deviceId // isRegister
             ? {
                 password: credentials?.password,

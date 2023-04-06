@@ -10,16 +10,17 @@ const BreadcrumbRoot = styled('div')(() => ({
 
 const SubName = styled('span')(({ theme }) => ({
   textTransform: 'uppercase',
-  color: '#495057',
+  //   color: '#495057',
   fontWeight: 500,
   fontSize: '13px',
 }))
 
 export interface IProps {
+  textColor?: 'dark' | 'light'
   routeSegments: { name?: string; path?: string }[]
 }
 
-export function Breadcrumb({ routeSegments }: IProps) {
+export function Breadcrumb({ textColor = 'dark', routeSegments }: IProps) {
   return (
     <BreadcrumbRoot>
       <Breadcrumbs
@@ -30,6 +31,12 @@ export function Breadcrumb({ routeSegments }: IProps) {
               width={16}
               height={16}
               alt=""
+              style={{
+                filter:
+                  textColor === 'dark'
+                    ? 'invert(0%) sepia(99%) saturate(15%) hue-rotate(13deg) brightness(94%) contrast(100%)'
+                    : 'invert(100%) sepia(100%) saturate(0%) hue-rotate(84deg) brightness(111%) contrast(101%)',
+              }}
             />
           </Box>
         }
@@ -41,7 +48,11 @@ export function Breadcrumb({ routeSegments }: IProps) {
       >
         <Link href="/" passHref>
           <a>
-            <SubName>Trang chủ</SubName>
+            <SubName
+              sx={{ color: textColor === 'dark' ? '#495057' : '#FFFFFF' }}
+            >
+              Trang chủ
+            </SubName>
           </a>
         </Link>
 
@@ -50,11 +61,22 @@ export function Breadcrumb({ routeSegments }: IProps) {
               return index !== routeSegments.length - 1 ? (
                 <Link key={index} href={route.path ?? ''} passHref>
                   <a>
-                    <SubName>{route.name}</SubName>
+                    <SubName
+                      sx={{
+                        color: textColor === 'dark' ? '#495057' : '#FFFFFF',
+                      }}
+                    >
+                      {route.name}
+                    </SubName>
                   </a>
                 </Link>
               ) : (
-                <SubName key={index}>{route.name}</SubName>
+                <SubName
+                  key={index}
+                  sx={{ color: textColor === 'dark' ? '#495057' : '#FFFFFF' }}
+                >
+                  {route.name}
+                </SubName>
               )
             })
           : null}

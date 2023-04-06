@@ -1,3 +1,4 @@
+import { IBanner } from '@/models/banner'
 import { Box, Button, IconButton, Stack, Typography } from '@mui/material'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
@@ -5,14 +6,16 @@ import * as React from 'react'
 import { LazyNextImage } from '../LazyNextImage'
 import { Video } from '../Video'
 
-export interface Props {}
+export interface Props {
+  slides: IBanner[]
+}
 const images = [
   '/assets/images/bg-banner.jpg',
   '/assets/images/bg-banner.jpg',
   '/assets/images/card-img-2.jpg',
 ]
 
-export function FMSwiperSlider(props: Props) {
+export function FMSwiperSlider({ slides }: Props) {
   const [index, setIndex] = React.useState(0)
 
   React.useEffect(() => {

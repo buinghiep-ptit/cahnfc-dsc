@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material'
 import * as React from 'react'
-import VideoPlayer from '../VideoPlayer'
+import { VideoPlayer } from '../VideoPlayer'
 
 export interface IVideoProps {}
 

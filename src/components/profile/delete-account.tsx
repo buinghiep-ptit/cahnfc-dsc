@@ -1,8 +1,5 @@
-import {
-  emailSchema,
-  phoneNumberSchema,
-  phoneRegExp,
-} from '@/helpers/schemaYup'
+import { resendOTP } from '@/api-client'
+import { phoneRegExp } from '@/helpers/schemaYup'
 import { messages } from '@/utils/messages'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, Container, FormControlLabel, Radio, Stack } from '@mui/material'
@@ -21,7 +18,7 @@ import { JustifyBox } from '../home/CAHNTV'
 type SchemaType = {
   email?: string
   phoneNumber?: string
-  registerType?: 1 | 2
+  registerType?: number
 }
 export interface IDeleteAccountProps {}
 
@@ -30,7 +27,6 @@ export function DeleteAccount(props: IDeleteAccountProps) {
   const [isResend, setIsResend] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
   const [countDown, setCountDown] = React.useState(0)
-  const [type, setType] = React.useState(1)
 
   React.useEffect(() => {
     if (!isResend) return
@@ -89,6 +85,7 @@ export function DeleteAccount(props: IDeleteAccountProps) {
   )
 
   const methods = useForm({
+    defaultValues: { registerType: 1, email: '', phoneNumber: '' },
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
@@ -101,21 +98,29 @@ export function DeleteAccount(props: IDeleteAccountProps) {
     methods.setValue('email', '')
     methods.setValue('phoneNumber', '')
     methods.clearErrors()
-    setType(registerType)
   }, [registerType, methods])
 
   const onSubmitHandler: SubmitHandler<SchemaType> = async (
     values: SchemaType,
   ) => {
-    console.log(values)
+    try {
+      setIsLoading(true)
+      await resendOTP({
+        phone: values.phoneNumber ?? '',
+        email: values.email ?? '',
+        otpType: 'REMOVE_ACCOUNT',
+      })
+      setOtp('')
+      setIsResend(true)
+      setCountDown(60)
+      setIsLoading(false)
+    } catch (error) {
+      setIsLoading(false)
+    }
   }
 
-  const resendOTPRegister = async () => {
-    setOtp('')
-    setIsResend(true)
-    setCountDown(60)
-    //    await resendOTP({ phone: phoneNumber, otpType: 'REGISTER' })
-  }
+  const finishDeleteAccount = async () => {}
+
   return (
     <Box
       sx={{
@@ -201,12 +206,12 @@ export function DeleteAccount(props: IDeleteAccountProps) {
                   </Stack>
                 </MuiRHFRadioGroup>
                 <MuiButton
+                  type="submit"
                   disabled={
                     !!countDown ||
                     (!phoneNumber && !email) ||
                     !_.isEmpty(methods.formState.errors)
                   }
-                  onClick={resendOTPRegister}
                   title={countDown ? `${countDown}s` : 'Gửi mã'}
                   sx={{ bgcolor: '#212529', color: '#FFD200', width: 400 }}
                 />
@@ -229,6 +234,7 @@ export function DeleteAccount(props: IDeleteAccountProps) {
                   Nhập mã xác nhận
                 </MuiTypography>
                 <OtpInput
+                  disabled={!countDown}
                   value={otp}
                   onChange={val => {
                     setOtp(val)

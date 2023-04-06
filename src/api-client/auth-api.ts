@@ -87,7 +87,7 @@ export const resendOTP = async (params: {
     | 'UPDATE_EMAIL'
 }): Promise<{ verify?: string }> => {
   const { data } = await http.post<any, AxiosResponse<{ verify?: string }>>(
-    '/auth/api/customer/register',
+    '/auth/api/customer/public/resend-otp',
     params,
   )
   return data
@@ -156,5 +156,28 @@ export const validateForgotOTP = async (params: {
     any,
     AxiosResponse<{ accessToken?: string }>
   >('/auth/api/customer/password/validate', params)
+  return data
+}
+
+// REMOVE ACCOUNT
+
+export const removeAccValidate = async (params: {
+  otp?: string
+  type?: 1 | 2
+}): Promise<{ accessToken?: string }> => {
+  const { data } = await http.post<
+    any,
+    AxiosResponse<{ accessToken?: string }>
+  >('/auth/api/customer/remove/account/validate', params)
+  return data
+}
+
+export const removeAccFinished = async (
+  type?: 1 | 2,
+): Promise<{ accessToken?: string }> => {
+  const { data } = await http.post<
+    any,
+    AxiosResponse<{ accessToken?: string }>
+  >(`/auth/api/customer/remove/account?type=${type}`)
   return data
 }

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import { requestForgotOTP, resendOTP, validateForgotOTP } from '@/api-client'
 import { AuthContainer } from '@/components/AuthContainer'
-import AppLoading from '@/components/commons/AppLoading'
+import { AppLoading } from '@/components/commons/AppLoading'
 import { MuiButton } from '@/components/commons/MuiButton'
 import { MuiRHFInputText } from '@/components/commons/MuiRHFTextInput'
 import { OtpInput } from '@/components/commons/otp-input'
@@ -181,10 +181,16 @@ export default function ForgotPassword(props: IProps) {
   }
 
   const resendOTPRegister = async () => {
-    setOtp('')
-    setIsResend(true)
-    setCountDown(60)
-    await resendOTP({ phone: phoneNumber, otpType: 'FORGOT_PASSWORD' })
+    try {
+      setIsLoading(true)
+      await resendOTP({ phone: phoneNumber, otpType: 'FORGOT_PASSWORD' })
+      setOtp('')
+      setIsResend(true)
+      setCountDown(60)
+      setIsLoading(false)
+    } catch (error) {
+      setIsLoading(false)
+    }
   }
 
   return (

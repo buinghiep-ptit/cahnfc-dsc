@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import { registerOTP, resendOTP, validateOTP } from '@/api-client'
 import { AuthContainer } from '@/components/AuthContainer'
-import AppLoading from '@/components/commons/AppLoading'
+import { AppLoading } from '@/components/commons/AppLoading'
 import { MuiButton } from '@/components/commons/MuiButton'
 import { MuiRHFCheckBox } from '@/components/commons/MuiRHFCheckBox'
 import { MuiRHFInputText } from '@/components/commons/MuiRHFTextInput'
@@ -225,10 +225,16 @@ export default function SignUp(props: IProps) {
   }
 
   const resendOTPRegister = async () => {
-    setOtp('')
-    setIsResend(true)
-    setCountDown(60)
-    await resendOTP({ phone: phoneNumber, otpType: 'REGISTER' })
+    try {
+      setIsLoading(true)
+      await resendOTP({ phone: phoneNumber, otpType: 'REGISTER' })
+      setOtp('')
+      setIsResend(true)
+      setCountDown(60)
+      setIsLoading(false)
+    } catch (error) {
+      setIsLoading(false)
+    }
   }
 
   return (

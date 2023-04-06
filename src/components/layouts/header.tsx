@@ -86,14 +86,14 @@ export function HeaderNavbar(props: Props) {
 
   const handleSignOut = async () => {
     try {
-      // await logOut()
+      await logOut()
       await signOut({ callbackUrl: window.location.href })
     } catch (error) {}
   }
   const routesLeft: IRoute[] = [
     {
       name: 'Tin tức',
-      route: '/',
+      route: '/news',
     },
     {
       name: 'Video',
