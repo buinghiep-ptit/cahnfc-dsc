@@ -10,19 +10,9 @@ import { TrapezoidInfo } from '@/components/home/TrapezoidInfo'
 import { PrimaryLayout } from '@/layouts'
 import { NextPageWithLayout } from '@/models'
 import { Box, Container } from '@mui/material'
-import { ReactElement, useEffect } from 'react'
+import { ReactElement } from 'react'
 
 const Home: NextPageWithLayout = () => {
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const result = await fetch(
-          `https://cahn-api.campdi.vn:443/store/public/api/categories`,
-        )
-        const data = await result.json()
-      } catch (error) {}
-    })()
-  }, [])
   return (
     <Box position={'relative'} bgcolor={'#ed1e24'}>
       <Banner />

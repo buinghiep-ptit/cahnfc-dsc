@@ -2,7 +2,7 @@
 import { login, loginSocial, renewToken, setPassword } from '@/api-client'
 import { getMessageString } from '@/helpers/messageToString'
 import { NextApiRequest, NextApiResponse } from 'next'
-import NextAuth, { NextAuthOptions, SessionStrategy } from 'next-auth'
+import NextAuth, { NextAuthOptions } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 import AppleProvider from 'next-auth/providers/apple'
 import CredentialsProvider from 'next-auth/providers/credentials'
@@ -13,7 +13,6 @@ const refreshAccessToken = async (payload: {
   refreshToken: string
 }): Promise<JWT> => {
   try {
-    // Get a new set of tokens with a refreshToken
     const tokenResponse = await renewToken(payload)
 
     return {
@@ -29,8 +28,7 @@ const refreshAccessToken = async (payload: {
     }
   }
 }
-// For more information on each option (and a full list of options) go to
-// https://next-auth.js.org/configuration/options
+
 const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
   return {
     providers: [
@@ -110,13 +108,8 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
       }),
     ],
     // refetchInterval: 1 * 24 * 60 * 60,
-    secret: process.env.SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
     debug: true,
-    pages: {
-      signIn: '/auth/signin',
-      signOut: '/auth/signout',
-      error: '/auth/error', // Error code passed in query string as ?error=
-    },
     callbacks: {
       signIn: async ({ user, account }: { user: any; account: any }) => {
         if (account.provider !== 'credentials') {
@@ -139,21 +132,11 @@ const nextAuthOptions = (req: NextApiRequest, res: NextApiResponse) => {
 
         return true
       },
-      onError: async (error: any) => {
-        // You can customize the error message as per your needs
-        return Promise.resolve({
-          error: 'Login Failed',
-          message: error.message,
-        })
-      },
       async redirect({ url, baseUrl }: any) {
-        // Allows relative callback URLs
         if (url.startsWith('/')) return `${baseUrl}${url}`
-        // Allows callback URLs on the same origin
         else if (new URL(url).origin === baseUrl) return url
         return baseUrl
       },
-      register: async ({ phoneNumber, otp }: Record<string, string>) => {},
       jwt: async ({
         token,
         user,

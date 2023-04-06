@@ -19,8 +19,9 @@ export function CAHNTV(props: IProps) {
       .map((_, index) => ({
         id: index + 1,
         thumb: `/assets/images/home/video-card.jpg`,
-        type: Math.floor(Math.random() * 3) + 1,
+        type: 1,
         title: 'Công An Hà Nội - Hoàng Anh Gia Lai| Siêu phẩm sút xa, 90 phút',
+        datePublished: '2023-04-06T09:10:36.067Z',
       })),
   )
 

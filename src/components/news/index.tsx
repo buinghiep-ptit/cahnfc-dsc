@@ -12,10 +12,11 @@ export function News(props: IProps) {
       .map((_, index) => ({
         id: index + 1,
         thumb: `/assets/images/home/video-card.jpg`,
-        type: Math.floor(Math.random() * 3) + 1,
+        type: 1,
         title: 'Công An Hà Nội - Hoàng Anh Gia Lai| Siêu phẩm sút xa, 90 phút',
         shortDescription:
           'Bàn thắng đẹp mắt từ cự ly 30m của ngoại binh Jhon Cley bên phía Công an Hà Nội khiến đối thủ Hoàng Anh Gia Lai chỉ có được kết quả hòa ở vòng 4 V-League 202',
+        datePublished: '2023-04-06T09:10:36.067Z',
       })),
   )
   return (

@@ -54,19 +54,19 @@ export default function MyPage() {
 
             const data = await fetchDataHome(sectionId)
 
-            fetch(
-              `https://js-post-api.herokuapp.com/api/posts?_page=${sectionId.slice(
-                7,
-              )}`,
-            )
-              .then(res => res.json())
-              .then(data => {
-                // Cập nhật dữ liệu đã tải cho section và render lại
-                sectionData.data = data.data
-                sectionData.loaded = true
-                const newSectionsData = [...sectionsData, sectionData]
-                setSectionsData([...newSectionsData])
-              })
+            // fetch(
+            //   `https://js-post-api.herokuapp.com/api/posts?_page=${sectionId.slice(
+            //     7,
+            //   )}`,
+            // )
+            //   .then(res => res.json())
+            //   .then(data => {
+            //     // Cập nhật dữ liệu đã tải cho section và render lại
+            //     sectionData.data = data.data
+            //     sectionData.loaded = true
+            //     const newSectionsData = [...sectionsData, sectionData]
+            //     setSectionsData([...newSectionsData])
+            //   })
           }
         }
       })

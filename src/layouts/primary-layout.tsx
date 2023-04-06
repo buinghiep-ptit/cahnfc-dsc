@@ -9,16 +9,12 @@ export interface IDefaultLayoutProps {
   isChangeColorHeader?: boolean
 }
 
-function Loading() {
-  return <div>Loading...</div>
-}
-
 export function PrimaryLayout({
   children,
   isChangeColorHeader = true,
 }: IDefaultLayoutProps) {
   return (
-    <React.Suspense fallback={<Loading />}>
+    <>
       <Seo title="CAHNFC | Trang bóng đá số 1 Việt Nam" />
       <Box
         minHeight="100vh"
@@ -44,6 +40,6 @@ export function PrimaryLayout({
         </Box>
         <Footer />
       </Box>
-    </React.Suspense>
+    </>
   )
 }
