@@ -43,7 +43,7 @@ class Http {
 
   initHttp() {
     const http = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL,
+      baseURL: 'https://cahn-api.campdi.vn',
       headers: headers,
       paramsSerializer: params => queryString.stringify(params),
       timeout: 15000,
